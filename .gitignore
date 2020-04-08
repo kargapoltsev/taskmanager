@@ -2,3 +2,7 @@
 *.user
 
 build/
+
+cmake-build-debug/
+
+.idea/

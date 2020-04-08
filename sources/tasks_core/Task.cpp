@@ -5,27 +5,37 @@
 
 #include <iostream>
 
-enum class Task::Priority { Low, Normal, Hight };
+enum class Task::Priority {
+    Low, Normal, Hight
+};
 
-Task::Task( const std::string &strName, ptr_t pParent )
+Task::Task( const std::string &strName, ptr_t pParent, const std::string &strUuid )
     : m_pParent( pParent )
     , m_strName( strName )
-    , m_strUuid( strName )
+    , m_strUuid( strUuid )
     , m_priority( Priority::Normal )
+    , m_nComplete( 0 )
 {
     if ( m_pParent )
         m_pParent->addChild( this );
+
+    if ( m_strUuid.empty() )
+        m_strUuid = m_strName;
 }
 
 Task::~Task()
 {
-    std::for_each( std::begin( m_childs ), std::end( m_childs ),
-    [=] ( ptr_t pChild ) {
-        delete pChild;
-        pChild = nullptr;
-    } );
+    if ( !m_childs.empty() )
+    {
+        std::for_each( std::begin( m_childs ), std::end( m_childs ),
+        [=] ( ptr_t pChild )
+        {
+            if ( pChild )
+                delete pChild;
+        } );
 
-    m_childs.clear();
+        m_childs.clear();
+    }
 }
 
 void Task::addChild( ptr_t pChild )
@@ -38,7 +48,7 @@ void Task::addChild( ptr_t pChild )
     m_childs.push_back( pChild );
 }
 
-const Task::ptr_t Task::getChild( std::size_t nChildIndex ) const
+Task::ptr_t Task::getChild( std::size_t nChildIndex ) const
 {
     if ( nChildIndex >= m_childs.size() )
         throw std::logic_error( "The index exceeds the size of the collection of children." );
@@ -57,7 +67,7 @@ void Task::insertChild( Task::ptr_t pChild, std::size_t nChildIndex )
 
     auto pNeighbourChild = getChild( nChildIndex );
 
-    auto itNeighbourChild = std::find( m_childs.begin(), m_childs.end(), pNeighbourChild );
+    auto itNeighbourChild = std::find( std::begin( m_childs ), std::end( m_childs ), pNeighbourChild );
 
     m_childs.insert( itNeighbourChild, pChild );
 }
@@ -72,7 +82,7 @@ void Task::removeChild( const ptr_t pChild )
     if ( !pChild )
         throw std::logic_error( "Child pointer is null" );
 
-    auto it = std::find( m_childs.begin(), m_childs.end(), pChild );
+    auto it = std::find( std::begin( m_childs ), std::end( m_childs ), pChild );
 
     if ( it != m_childs.end() )
         m_childs.erase( it );
@@ -137,6 +147,27 @@ void Task::setParent( const ptr_t pParent )
         throw std::logic_error( "Parent pointer is null" );
 
     m_pParent = pParent;
+}
+
+std::uint8_t Task::getComplete() const
+{
+    return m_nComplete;
+}
+
+void Task::setComplete( const std::uint8_t &nComplete )
+{
+    if ( nComplete > 100 )
+        throw std::logic_error( "Value greater than 100" );
+
+    m_nComplete = nComplete;
+}
+
+void Task::remove()
+{
+    if ( m_pParent )
+        m_pParent->removeChild( this );
+    else
+        delete this;
 }
 
 void Task::changePatent( const Task::ptr_t pNewParent )

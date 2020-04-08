@@ -141,3 +141,12 @@ TEST_F( TaskTest, TestGetChildIndex )
     ASSERT_EQ( nSourceIndex, nResultingIndex );
 }
 
+TEST_F( TaskTest, TestRemoveTask )
+{
+    auto nRootTaskChildsCount = m_pRootTask->getChildsCount();
+
+    m_pTask1->remove();
+
+    ASSERT_EQ( m_pRootTask->getChildsCount(), nRootTaskChildsCount - 1 );
+}
+

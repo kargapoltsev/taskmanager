@@ -2,14 +2,14 @@ set ( LIB_NAME TasksCore )
 
 set ( HEADER_FILES 
     "Task.h"
-#    "Project.h"
-#    "TasksRepository.h"
+    "Project.h"
+    "DataStore.h"
 )
 
 set ( SOURCE_FILES 
     "Task.cpp"
-#    "Project.cpp"
-#    "TasksRepository.cpp"
+    "Project.cpp"
+    "DataStore.cpp"
 )
 
 add_library( ${LIB_NAME} SHARED ${HEADER_FILES} ${SOURCE_FILES} )
