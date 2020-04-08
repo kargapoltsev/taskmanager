@@ -92,9 +92,20 @@ QVariant HierarchyTaskListModel::data( const QModelIndex & index, int role ) con
     return QVariant();
 }
 
-bool HierarchyTaskListModel::setData( const QModelIndex & index, const QVariant &value, int role )
+bool HierarchyTaskListModel::setData( const QModelIndex &index, const QVariant &value, int role )
 {
-    return true;
+    if ( index.isValid() && role == Qt::EditRole )
+    {
+        auto pTask = getTaskFromIndex( index );
+
+        pTask->setName( value.toString().toStdString() );
+
+        emit dataChanged( index, index, { Qt::DisplayRole, Qt::EditRole } );
+
+        return true;
+    }
+
+    return false;
 }
 
 QVariant HierarchyTaskListModel::headerData( int section, Qt::Orientation orientation, int role ) const
@@ -120,12 +131,12 @@ QVariant HierarchyTaskListModel::headerData( int section, Qt::Orientation orient
 
 bool HierarchyTaskListModel::insertRows( int row, int count, const QModelIndex & parent )
 {
-    auto parentItem = getTaskFromIndex( parent );
-    if ( !parentItem )
+    auto pParentTask = getTaskFromIndex( parent );
+    if ( !pParentTask )
         return false;
 
     QAbstractItemModel::beginInsertRows( parent, row, row + count - 1 );
-    parentItem->addChild( new Task( "New task" ) );
+    m_pProject->addTask( new Task( "New task" ), pParentTask );
     QAbstractItemModel::endInsertRows();
 
     return true;
@@ -154,7 +165,12 @@ Qt::ItemFlags HierarchyTaskListModel::flags(const QModelIndex & index) const
     if ( !index.isValid() )
         return Qt::NoItemFlags;
 
-    return Qt::ItemIsEnabled | QAbstractItemModel::flags(index);
+    auto flags = QAbstractItemModel::flags(index);
+
+    if ( index.column() == 0 )
+        flags |= Qt::ItemIsEditable;
+
+    return Qt::ItemIsEnabled | flags;
 }
 
 void HierarchyTaskListModel::setProject(Project * pProject)

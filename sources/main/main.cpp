@@ -48,19 +48,6 @@
 
 int main(int argc, char** argv)
 {
-
-//    auto pRootTask = Task::create( "Root" );
-
-//    auto pTask1 = Task::create( "Task1", pRootTask );
-//    Task::create( "Task2", pRootTask );
-
-//    auto pSubTask1 = Task::create( "Subtask 1", pTask1 );
-//    Task::create( "Subtask 2", pSubTask1 );
-//    Task::create( "Subtask 3", pTask1 );
-
-//    printTasks( pRootTask );
-
-
     auto pTask1 = new Task( "Task1" );
     auto pSubTask1 = new Task( "Subtask 1", pTask1 );
     auto pSubTask2 = new Task( "Subtask 2", pSubTask1 );

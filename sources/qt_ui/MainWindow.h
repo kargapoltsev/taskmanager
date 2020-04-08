@@ -29,6 +29,6 @@ public slots:
 private:
     DataStore * m_pDataStore;
     Project *m_pCurrentProject;
-    HierarchyTaskListModel *m_pHierarchyTaskListModel;
-    QTreeView *m_pTreeView;
+    HierarchyTaskListModel *m_pModel;
+    QTreeView *m_pView;
 };

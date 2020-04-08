@@ -16,7 +16,7 @@
 #include "Task.h"
 
 MainWindow::MainWindow()
-    : m_pHierarchyTaskListModel( new HierarchyTaskListModel( this ) )
+    : m_pModel( new HierarchyTaskListModel( this ) )
 {
 
 }
@@ -37,17 +37,17 @@ void MainWindow::initialize()
 
     m_pCurrentProject = m_pDataStore->getProject( "Free tasks" );
 
-    m_pHierarchyTaskListModel->setProject( m_pCurrentProject );
+    m_pModel->setProject( m_pCurrentProject );
 
-    m_pTreeView = new QTreeView( this );
-    m_pTreeView->setModel( m_pHierarchyTaskListModel );
-    m_pTreeView->header()->moveSection( 1, 0 );
-    m_pTreeView->expandAll();
-    m_pTreeView->resizeColumnToContents( 0 );
-    m_pTreeView->resizeColumnToContents( 1 );
-    m_pTreeView->resizeColumnToContents( 2 );
+    m_pView = new QTreeView( this );
+    m_pView->setModel( m_pModel );
+    m_pView->header()->moveSection( 1, 0 );
+    m_pView->expandAll();
+    m_pView->resizeColumnToContents( 0 );
+    m_pView->resizeColumnToContents( 1 );
+    m_pView->resizeColumnToContents( 2 );
 
-    QMainWindow::setCentralWidget( m_pTreeView );
+    QMainWindow::setCentralWidget( m_pView );
 
 }
 
@@ -58,9 +58,10 @@ void MainWindow::slotExit()
 
 void MainWindow::slotAddNewTask()
 {
-//    std::cout << "Add new task" << std::endl;
+    const auto index = m_pView->selectionModel()->currentIndex();
 
-//    m_pHierarchyTaskListModel->setData( );
+    if (!m_pModel->insertRow( index.row() + 1, index.parent() ) )
+        return;
 }
 
 DataStore * MainWindow::getTasksRepository() const
