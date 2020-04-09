@@ -18,8 +18,13 @@ QModelIndex HierarchyTaskListModel::index( int row, int column, const QModelInde
         return QModelIndex();
 
     auto pParentTask = getTaskFromIndex( parent );
-    auto pChildTask = pParentTask->getChild( static_cast<std::size_t>( row ) );
+    if ( !pParentTask )
+        return QModelIndex();
 
+    if ( static_cast<std::size_t>( row ) >= pParentTask->getChildsCount() )
+        return QModelIndex();
+
+    auto pChildTask = pParentTask->getChild( static_cast<std::size_t>( row ) );
     if ( !pChildTask )
         return QModelIndex();
 
@@ -28,24 +33,24 @@ QModelIndex HierarchyTaskListModel::index( int row, int column, const QModelInde
 
 QModelIndex HierarchyTaskListModel::parent( const QModelIndex & child ) const
 {
-    auto pChildTask = getTaskFromIndex( child );
+    if (!child.isValid())
+        return QModelIndex();
 
+    auto pChildTask = getTaskFromIndex( child );
     if ( !pChildTask )
         return QModelIndex();
 
     auto pParentTask = pChildTask->getParent();
-
     if ( !pParentTask )
         return QModelIndex();
 
     auto pGrandParentTask = pParentTask->getParent();
-
     if ( !pGrandParentTask )
         return QModelIndex();
 
-    auto row = pGrandParentTask->getChildIndex( pParentTask );
+    auto nParentPosition = pGrandParentTask->getChildIndex( pParentTask );
 
-    return createIndex( static_cast<int>(row), 0, pParentTask );
+    return createIndex( static_cast<int>(nParentPosition), 0, pParentTask );
 }
 
 int HierarchyTaskListModel::rowCount( const QModelIndex & parent ) const
@@ -144,12 +149,12 @@ bool HierarchyTaskListModel::insertRows( int row, int count, const QModelIndex &
 
 bool HierarchyTaskListModel::removeRows( int row, int count, const QModelIndex & parent )
 {
-    auto parentItem = getTaskFromIndex( parent );
-    if ( !parentItem )
+    auto pParentTask = getTaskFromIndex( parent );
+    if ( !pParentTask )
         return false;
 
     QAbstractItemModel::beginRemoveRows( parent, row, row + count - 1);
-    parentItem->removeChild( row );
+    pParentTask->removeChild( row );
     QAbstractItemModel::endRemoveRows();
 
     return true;

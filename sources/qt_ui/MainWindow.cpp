@@ -25,11 +25,13 @@ void MainWindow::initialize()
 {
     auto pMenuFile = new QMenu( "&File", this );
 //    pMenuFile->addAction( "&Save" );
-    pMenuFile->addAction( "&Exit", this, &MainWindow::slotExit, QKeySequence("Esc") );
+    pMenuFile->addAction( "E&xit", this, &MainWindow::slotExit, QKeySequence("Esc") );
     QMainWindow::menuBar()->addMenu( pMenuFile );
 
     auto pMenuTask = new QMenu( "&Task", this );
-    pMenuTask->addAction( "&Add new task", this, &MainWindow::slotAddNewTask );
+    pMenuTask->addAction( "Add &new task", this, &MainWindow::slotAddNewTask, QKeySequence("Enter") );
+    pMenuTask->addAction( "&Remove task", this, &MainWindow::slotRemoveTask, QKeySequence("Delete") );
+    pMenuTask->addAction( "Add &child task", this, &MainWindow::slotAddNewTask, QKeySequence("Ctrl + Enter") );
     QMainWindow::menuBar()->addMenu(( pMenuTask ));
 
     auto pLabel = new QLabel( "Developming...", this );
@@ -61,6 +63,21 @@ void MainWindow::slotAddNewTask()
     const auto index = m_pView->selectionModel()->currentIndex();
 
     if (!m_pModel->insertRow( index.row() + 1, index.parent() ) )
+        return;
+}
+
+void MainWindow::slotRemoveTask()
+{
+    const auto index = m_pView->selectionModel()->currentIndex();
+
+    m_pModel->removeRow( index.row(), index.parent() );
+}
+
+void MainWindow::slotAddChildTask()
+{
+    const auto index = m_pView->selectionModel()->currentIndex();
+
+    if (!m_pModel->insertRow( index.row() + 1, index ) )
         return;
 }
 
