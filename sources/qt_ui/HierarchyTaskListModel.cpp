@@ -141,7 +141,15 @@ bool HierarchyTaskListModel::insertRows( int row, int count, const QModelIndex &
         return false;
 
     QAbstractItemModel::beginInsertRows( parent, row, row + count - 1 );
-    m_pProject->addTask( new Task( "New task" ), pParentTask );
+
+    auto pTask = new Task( "New task" );
+
+    auto nRow = static_cast<std::size_t>(row);
+
+    if ( nRow != pParentTask->getChildsCount() )
+        m_pProject->insertTask( pTask, pParentTask, nRow );
+    else
+        m_pProject->addTask( pTask , pParentTask );
     QAbstractItemModel::endInsertRows();
 
     return true;

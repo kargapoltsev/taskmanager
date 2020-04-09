@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 {
     auto pTask1 = new Task( "Task1" );
     auto pSubTask1 = new Task( "Subtask 1", pTask1 );
-    auto pSubTask2 = new Task( "Subtask 2", pSubTask1 );
+    new Task( "Subtask 2", pSubTask1 );
     auto pTask2 = new Task( "Task2" );
 
     auto upProject = std::make_unique<Project>( "Free tasks" );

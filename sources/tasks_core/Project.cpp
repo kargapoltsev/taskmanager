@@ -30,7 +30,17 @@ void Project::addTask( Task *pTask, Task *pParent )
     else
         pParent->addChild( pTask );
 
-   addTaskRecursive( pTask );
+    registerTaskRecursive( pTask );
+}
+
+void Project::insertTask(Task *pTask, Task *pParent, std::size_t nPosition )
+{
+    if ( !pParent )
+        m_upRootTask->insertChild( pTask, nPosition );
+    else
+        pParent->insertChild( pTask, nPosition );
+
+    registerTaskRecursive( pTask );
 }
 
 Task * Project::getTask( const std::string strUuid ) const
@@ -68,14 +78,14 @@ std::size_t Project::getTasksCount() const
     return m_tasksCache.size();
 }
 
-void Project::addTaskRecursive( Task * pTask )
+void Project::registerTaskRecursive( Task * pTask )
 {
     if ( pTask->getChildsCount() > 0 )
     {
         std::for_each( pTask->getChildsBegin(), pTask->getChildsEnd(),
         [=] ( Task *pTask )
         {
-            addTaskRecursive( pTask );
+            registerTaskRecursive( pTask );
         } );
     }
 

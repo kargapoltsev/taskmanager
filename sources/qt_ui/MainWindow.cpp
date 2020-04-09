@@ -31,7 +31,7 @@ void MainWindow::initialize()
     auto pMenuTask = new QMenu( "&Task", this );
     pMenuTask->addAction( "Add &new task", this, &MainWindow::slotAddNewTask, QKeySequence("Enter") );
     pMenuTask->addAction( "&Remove task", this, &MainWindow::slotRemoveTask, QKeySequence("Delete") );
-    pMenuTask->addAction( "Add &child task", this, &MainWindow::slotAddNewTask, QKeySequence("Ctrl + Enter") );
+    pMenuTask->addAction( "Add &child task", this, &MainWindow::slotAddChildTask, QKeySequence("Ctrl + Enter") );
     QMainWindow::menuBar()->addMenu(( pMenuTask ));
 
     auto pLabel = new QLabel( "Developming...", this );
@@ -77,7 +77,7 @@ void MainWindow::slotAddChildTask()
 {
     const auto index = m_pView->selectionModel()->currentIndex();
 
-    if (!m_pModel->insertRow( index.row() + 1, index ) )
+    if (!m_pModel->insertRow( 0, index ) )
         return;
 }
 

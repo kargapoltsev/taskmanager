@@ -18,6 +18,8 @@ public:
 
     void addTask( Task *pTask, Task *pParent = nullptr );
 
+    void insertTask( Task *pTask, Task *pParent = nullptr, std::size_t nPosition = 0 );
+
     Task * getTask( const std::string strUuid ) const;
 
     void removeTask( const std::string strUuid );
@@ -29,7 +31,7 @@ public:
     std::size_t getTasksCount() const;
 
 private:
-    void addTaskRecursive( Task *pTask );
+    void registerTaskRecursive( Task *pTask );
     void removeTaskRecursive( Task *pTask );
 
     std::unique_ptr<Task> m_upRootTask;
