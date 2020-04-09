@@ -29,9 +29,23 @@ void MainWindow::initialize()
     QMainWindow::menuBar()->addMenu( pMenuFile );
 
     auto pMenuTask = new QMenu( "&Task", this );
-    pMenuTask->addAction( "Add &new task", this, &MainWindow::slotAddNewTask, QKeySequence("Enter") );
-    pMenuTask->addAction( "&Remove task", this, &MainWindow::slotRemoveTask, QKeySequence("Delete") );
-    pMenuTask->addAction( "Add &child task", this, &MainWindow::slotAddChildTask, QKeySequence("Ctrl + Enter") );
+
+    pMenuTask->addAction( "Add &new task", this,
+                          &MainWindow::slotAddNewTask, QKeySequence( Qt::Key_Enter ) );
+
+    pMenuTask->addAction( "&Remove task", this,
+                          &MainWindow::slotRemoveTask, QKeySequence( Qt::Key_Delete ) );
+
+    pMenuTask->addAction( "Add &child task", this,
+                          &MainWindow::slotAddChildTask, QKeySequence( Qt::CTRL + Qt::Key_Enter ) );
+
+    pMenuTask->addAction( "&Up task", this,
+                          &MainWindow::slotUpTask, QKeySequence( Qt::CTRL + Qt::Key_Up ) );
+
+    pMenuTask->addAction( "&Down task", this,
+                          &MainWindow::slotDownTask, QKeySequence( Qt::CTRL + Qt::Key_Down ) );
+
+
     QMainWindow::menuBar()->addMenu(( pMenuTask ));
 
     auto pLabel = new QLabel( "Developming...", this );
@@ -59,6 +73,9 @@ void MainWindow::slotAddNewTask()
 {
     const auto index = m_pView->selectionModel()->currentIndex();
 
+    if ( !index.isValid() )
+        return;
+
     if ( m_pModel->insertRow( index.row() + 1, index.parent() ) )
         update();
 }
@@ -77,6 +94,34 @@ void MainWindow::slotAddChildTask()
 
     if ( m_pModel->insertRow( 0, index ) )
         update();
+}
+
+void MainWindow::slotUpTask()
+{
+    const auto index = m_pView->selectionModel()->currentIndex();
+
+    if ( !index.isValid() )
+        return;
+
+    if ( m_pModel->moveRow( index.parent(), index.row(), index.parent(), index.row() - 1 ) )
+        update();
+}
+
+void MainWindow::slotDownTask()
+{
+    const auto index = m_pView->selectionModel()->currentIndex();
+
+    if ( !index.isValid() )
+        return;
+
+    auto nCurrentPositoin = index.row();
+    auto nNewPosition = nCurrentPositoin + 1;
+
+    if ( m_pModel->moveRow( index.parent(), nCurrentPositoin, index.parent(), nNewPosition ) )
+    {
+        m_pView->setCurrentIndex( m_pModel->index( nNewPosition, 0, index.parent() ) );
+        update();
+    }
 }
 
 DataStore * MainWindow::getTasksRepository() const

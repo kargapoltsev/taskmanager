@@ -66,7 +66,7 @@ int HierarchyTaskListModel::rowCount( const QModelIndex & parent ) const
     return pParentTask->getChildsCount();
 }
 
-int HierarchyTaskListModel::columnCount( const QModelIndex & parent ) const
+int HierarchyTaskListModel::columnCount( const QModelIndex & /* parent */) const
 {
     return 3;
 }
@@ -155,7 +155,7 @@ bool HierarchyTaskListModel::insertRows( int row, int count, const QModelIndex &
     return true;
 }
 
-bool HierarchyTaskListModel::removeRows( int row, int count, const QModelIndex & parent )
+bool HierarchyTaskListModel::removeRows( int row, int count, const QModelIndex &parent )
 {
     auto pParentTask = getTaskFromIndex( parent );
     if ( !pParentTask )
@@ -168,8 +168,38 @@ bool HierarchyTaskListModel::removeRows( int row, int count, const QModelIndex &
     return true;
 }
 
-bool HierarchyTaskListModel::moveRows(const QModelIndex & sourceParent, int sourceRow, int count, const QModelIndex & destinationParent, int destinationChild)
+bool HierarchyTaskListModel::moveRows( const QModelIndex &sourceParent,
+                                       int sourceRow, int count,
+                                       const QModelIndex &destinationParent,
+                                       int destinationChild )
 {
+    if ( !sourceParent.isValid() || !destinationParent.isValid() )
+        return false;
+
+    auto pSourceParentTask = getTaskFromIndex( sourceParent );
+    auto pDestinationParentTask = getTaskFromIndex( destinationParent );
+
+    if ( !pSourceParentTask || !pDestinationParentTask )
+        return false;
+
+    auto nSourceRow = static_cast<std::size_t>( sourceRow );
+    auto nDestinationRow = static_cast<std::size_t>( destinationChild );
+
+    auto pTask = pSourceParentTask->getChild( nSourceRow );
+
+    if ( !pTask )
+        return false;
+
+    auto retVal = QAbstractItemModel::beginMoveRows( sourceParent, sourceRow, sourceRow + count - 1, destinationParent, destinationChild );
+
+    if ( pSourceParentTask == pDestinationParentTask )
+        pSourceParentTask->swapChilds( nSourceRow, nDestinationRow );
+    else
+        pDestinationParentTask->insertChild( pTask, nDestinationRow );
+
+    if ( retVal )
+        QAbstractItemModel::endMoveRows();
+
     return true;
 }
 
