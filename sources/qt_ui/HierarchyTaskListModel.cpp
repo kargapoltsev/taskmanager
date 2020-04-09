@@ -142,7 +142,7 @@ bool HierarchyTaskListModel::insertRows( int row, int count, const QModelIndex &
 
     QAbstractItemModel::beginInsertRows( parent, row, row + count - 1 );
 
-    auto pTask = new Task( "New task" );
+    auto pTask = new Task( QString("New task %1").arg( pParentTask->getChildsCount() + 1 ).toStdString() );
 
     auto nRow = static_cast<std::size_t>(row);
 

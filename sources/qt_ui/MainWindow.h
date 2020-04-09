@@ -22,6 +22,9 @@ public:
     DataStore * getTasksRepository() const;
     void setTasksRepository( DataStore * pTasksRepository );
 
+private:
+    void update();
+
 public slots:
     void slotExit();
     void slotAddNewTask();
