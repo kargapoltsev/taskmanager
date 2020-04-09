@@ -25,6 +25,8 @@ public:
 public slots:
     void slotExit();
     void slotAddNewTask();
+    void slotRemoveTask();
+    void slotAddChildTask();
 
 private:
     DataStore * m_pDataStore;
