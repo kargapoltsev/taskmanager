@@ -98,13 +98,39 @@ void MainWindow::slotAddChildTask()
 
 void MainWindow::slotUpTask()
 {
-    const auto index = m_pView->selectionModel()->currentIndex();
+    const auto currentIndex = m_pView->selectionModel()->currentIndex();
 
-    if ( !index.isValid() )
+    if ( !currentIndex.isValid() )
         return;
 
-    if ( m_pModel->moveRow( index.parent(), index.row(), index.parent(), index.row() - 1 ) )
-        update();
+    const auto nIndexRow = currentIndex.row();
+
+    if ( nIndexRow == 0 )
+    {
+		auto parentIndex = currentIndex.parent();
+
+        if ( !parentIndex.isValid() )
+            return;
+
+		auto nParentIndexRow = parentIndex.row();
+
+        auto aboveTaskIndex = m_pModel->index( nParentIndexRow - 1, 0, parentIndex.parent() );
+        if ( !aboveTaskIndex.isValid() )
+            return;
+
+
+        if ( const auto nRowCount = m_pModel->rowCount( aboveTaskIndex );
+             m_pModel->moveRow( parentIndex, nIndexRow, aboveTaskIndex, nRowCount ) )
+        {
+            m_pView->setCurrentIndex( m_pModel->index( nRowCount, 0, aboveTaskIndex ) );
+			update();
+        }
+	}
+    else
+    {
+		if ( m_pModel->moveRow( currentIndex.parent(), currentIndex.row(), currentIndex.parent(), currentIndex.row() - 1 ) )
+			update();
+    }
 }
 
 void MainWindow::slotDownTask()
@@ -114,8 +140,8 @@ void MainWindow::slotDownTask()
     if ( !index.isValid() )
         return;
 
-    auto nCurrentPositoin = index.row();
-    auto nNewPosition = nCurrentPositoin + 1;
+    const auto nCurrentPositoin = index.row();
+    const auto nNewPosition = nCurrentPositoin + 1;
 
     if ( m_pModel->moveRow( index.parent(), nCurrentPositoin, index.parent(), nNewPosition ) )
     {

@@ -65,11 +65,10 @@ void Task::insertChild( Task::ptr_t pChild, std::size_t nChildIndex )
 
     pChild->setParent( this );
 
-    auto pNeighbourChild = getChild( nChildIndex );
-
+    const auto pNeighbourChild = getChild( nChildIndex );
     auto itNeighbourChild = std::find( std::begin( m_childs ), std::end( m_childs ), pNeighbourChild );
 
-    m_childs.insert( itNeighbourChild, pChild );
+    m_childs.insert( ++itNeighbourChild, pChild );
 }
 
 void Task::removeChild( std::size_t n )
@@ -82,12 +81,10 @@ void Task::removeChild( const ptr_t pChild )
     if ( !pChild )
         throw std::logic_error( "Child pointer is null" );
 
-    auto it = std::find( std::begin( m_childs ), std::end( m_childs ), pChild );
-
-    if ( it != m_childs.end() )
+    if (  auto it = std::find( std::begin( m_childs ), std::end( m_childs ), pChild ); it != m_childs.end() )
         m_childs.erase( it );
-    else
-        throw std::logic_error( "Child not found" );
+//    else
+//        throw std::logic_error( "Child not found" );
 }
 
 void Task::swapChilds( ptr_t pChild1, ptr_t pChild2 )
@@ -145,6 +142,9 @@ void Task::setParent( const ptr_t pParent )
 {
     if ( !pParent )
         throw std::logic_error( "Parent pointer is null" );
+
+    if ( m_pParent )
+        m_pParent->removeChild( this );
 
     m_pParent = pParent;
 }

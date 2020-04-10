@@ -49,17 +49,24 @@
 int main(int argc, char** argv)
 {
     auto pTask1 = new Task( "Task1" );
-    auto pSubTask1 = new Task( "Subtask 1", pTask1 );
-    new Task( "Subtask 2", pSubTask1 );
-    new Task( "Subtask 3", pSubTask1 );
-    new Task( "Subtask 4", pSubTask1 );
-    new Task( "Subtask 5", pSubTask1 );
+    new Task( "Subtask 11", pTask1 );
+    new Task( "Subtask 12", pTask1 );
+    new Task( "Subtask 13", pTask1 );
     auto pTask2 = new Task( "Task2" );
+    new Task( "Subtask 21", pTask2 );
+    new Task( "Subtask 22", pTask2 );
+    new Task( "Subtask 23", pTask2 );
+    auto pTask3 = new Task( "Task3" );
+    auto pTask4 = new Task( "Task4" );
+    auto pTask5 = new Task( "Task5" );
 
     auto upProject = std::make_unique<Project>( "Free tasks" );
 
     upProject->addTask( pTask1 );
     upProject->addTask( pTask2 );
+    upProject->addTask( pTask3 );
+    upProject->addTask( pTask4 );
+    upProject->addTask( pTask5 );
 
     DataStore taskRepository;
     taskRepository.addProject( std::move( upProject ) );
