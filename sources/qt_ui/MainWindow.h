@@ -32,6 +32,8 @@ public slots:
     void slotAddChildTask();
     void slotUpTask();
     void slotDownTask();
+    void slotDiveTask();
+    void slotAscentTask();
 
 private:
     DataStore * m_pDataStore;

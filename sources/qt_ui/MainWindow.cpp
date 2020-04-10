@@ -45,6 +45,12 @@ void MainWindow::initialize()
     pMenuTask->addAction( "&Down task", this,
                           &MainWindow::slotDownTask, QKeySequence( Qt::CTRL + Qt::Key_Down ) );
 
+    pMenuTask->addAction( "&Dive task", this,
+                          &MainWindow::slotDiveTask, QKeySequence( Qt::CTRL + Qt::Key_Right ) );
+
+    pMenuTask->addAction( "&Ascent task", this,
+                          &MainWindow::slotAscentTask, QKeySequence( Qt::CTRL + Qt::Key_Left ) );
+
 
     QMainWindow::menuBar()->addMenu(( pMenuTask ));
 
@@ -166,6 +172,53 @@ void MainWindow::slotDownTask()
             m_pView->setCurrentIndex( m_pModel->index( nNewPosition, 0, parentIndex ) );
             update();
         }
+    }
+}
+
+void MainWindow::slotDiveTask()
+{
+    const auto currentIndex = m_pView->selectionModel()->currentIndex();
+
+    if ( !currentIndex.isValid() )
+        return;
+
+    const auto parentIndex = currentIndex.parent();
+
+    const auto nCurrentPosition = currentIndex.row();
+
+    auto aboveTaskIndex = m_pModel->index( nCurrentPosition - 1, 0, parentIndex );
+    if ( !aboveTaskIndex.isValid() )
+        return;
+
+    if ( m_pModel->moveRow( parentIndex, nCurrentPosition,
+                            aboveTaskIndex, m_pModel->rowCount( aboveTaskIndex ) ) )
+        update();
+}
+
+void MainWindow::slotAscentTask()
+{
+    const auto currentIndex = m_pView->selectionModel()->currentIndex();
+
+    if ( !currentIndex.isValid() )
+        return;
+
+    const auto parentIndex = currentIndex.parent();
+
+    const auto nCurrentPosition = currentIndex.row();
+
+    auto nParentPosition = parentIndex.row();
+
+    if ( nParentPosition == -1 )
+        return;
+
+    const auto grandParentIndex = parentIndex.parent();
+
+    if ( m_pModel->moveRow( parentIndex, nCurrentPosition, grandParentIndex, 0 ) )
+    {
+        m_pView->setCurrentIndex(
+                    m_pModel->index( m_pModel->rowCount( grandParentIndex ) - 1,
+                    0, grandParentIndex ) );
+        update();
     }
 }
 
