@@ -190,8 +190,8 @@ bool HierarchyTaskListModel::moveRows( const QModelIndex &sourceParent,
 
 	const auto nDestinationRow = static_cast<std::size_t>( destinationChild );
 
-    if ( nDestinationRow > pDestinationParentTask->getChildsCount() )
-        return false;
+//    if ( nDestinationRow > pDestinationParentTask->getChildsCount() )
+//        return false;
 
 	auto retVal = QAbstractItemModel::beginMoveRows( sourceParent, sourceRow, sourceRow + count - 1, destinationParent, destinationChild );
 
@@ -199,10 +199,10 @@ bool HierarchyTaskListModel::moveRows( const QModelIndex &sourceParent,
 		pDestinationParentTask->swapChilds( nSourceRow, nDestinationRow );
 	else
 	{
-        if ( nDestinationRow == pDestinationParentTask->getChildsCount() - 1)
+        if ( pDestinationParentTask->getChildsCount() == 0 || pDestinationParentTask->getChildsCount() == nDestinationRow )
             pDestinationParentTask->addChild(pTask);
 		else
-            pDestinationParentTask->insertChild(pTask, nDestinationRow );
+            pDestinationParentTask->insertChild(pTask, nDestinationRow - 1);
 	}
 
 	if ( retVal )

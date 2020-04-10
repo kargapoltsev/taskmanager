@@ -103,14 +103,12 @@ void MainWindow::slotUpTask()
     if ( !currentIndex.isValid() )
         return;
 
+    const auto parentIndex = currentIndex.parent();
+
     const auto nCurrentPosition = currentIndex.row();
 
     if ( nCurrentPosition == 0 )
     {
-		auto parentIndex = currentIndex.parent();
-        if ( !parentIndex.isValid() )
-            return;
-
         auto nParentPosition = parentIndex.row();
 
         auto aboveTaskIndex = m_pModel->index( nParentPosition - 1, 0, parentIndex.parent() );
@@ -118,16 +116,17 @@ void MainWindow::slotUpTask()
             return;
 
         if ( const auto nRowCount = m_pModel->rowCount( aboveTaskIndex );
-             m_pModel->moveRow( parentIndex, nCurrentPosition, aboveTaskIndex, nRowCount - 1 ) )
+             m_pModel->moveRow( parentIndex, nCurrentPosition, aboveTaskIndex, nRowCount ) )
         {
             m_pView->setCurrentIndex( m_pModel->index( nRowCount, 0, aboveTaskIndex ) );
-			update();
+            update();
         }
-	}
+    }
     else
     {
-		if ( m_pModel->moveRow( currentIndex.parent(), currentIndex.row(), currentIndex.parent(), currentIndex.row() - 1 ) )
-			update();
+
+        if ( m_pModel->moveRow( parentIndex, nCurrentPosition, parentIndex, nCurrentPosition - 1 ) )
+            update();
     }
 }
 
@@ -139,21 +138,20 @@ void MainWindow::slotDownTask()
         return;
 
     const auto nCurrentPosition = currentIndex.row();
-
     auto parentIndex = currentIndex.parent();
-    if ( !parentIndex.isValid() )
-        return;
-
 
     if ( nCurrentPosition == m_pModel->rowCount( parentIndex ) - 1 )
     {
         auto nParentPosition = parentIndex.row();
 
+        if ( nParentPosition == -1 )
+            return;
+
         auto undexTaskIndex = m_pModel->index( nParentPosition + 1, 0, parentIndex.parent() );
         if ( !undexTaskIndex.isValid() )
             return;
 
-        if ( m_pModel->moveRow( parentIndex, nCurrentPosition, undexTaskIndex, 0 ) )
+        if ( m_pModel->moveRow( parentIndex, nCurrentPosition, undexTaskIndex, 1 ) )
         {
             m_pView->setCurrentIndex( m_pModel->index( 0, 0, undexTaskIndex ) );
             update();
