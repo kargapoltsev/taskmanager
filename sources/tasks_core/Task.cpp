@@ -68,7 +68,7 @@ void Task::insertChild( Task::ptr_t pChild, std::size_t nChildIndex )
     const auto pNeighbourChild = getChild( nChildIndex );
     auto itNeighbourChild = std::find( std::begin( m_childs ), std::end( m_childs ), pNeighbourChild );
 
-    m_childs.insert( ++itNeighbourChild, pChild );
+    m_childs.insert( itNeighbourChild, pChild );
 }
 
 void Task::removeChild( std::size_t n )

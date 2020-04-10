@@ -48,6 +48,7 @@
 
 int main(int argc, char** argv)
 {
+    auto pTask0 = new Task( "Task0" );
     auto pTask1 = new Task( "Task1" );
     new Task( "Subtask 11", pTask1 );
     new Task( "Subtask 12", pTask1 );
@@ -62,6 +63,7 @@ int main(int argc, char** argv)
 
     auto upProject = std::make_unique<Project>( "Free tasks" );
 
+    upProject->addTask( pTask0 );
     upProject->addTask( pTask1 );
     upProject->addTask( pTask2 );
     upProject->addTask( pTask3 );

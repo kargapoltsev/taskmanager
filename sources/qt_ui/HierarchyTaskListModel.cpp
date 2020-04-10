@@ -199,12 +199,10 @@ bool HierarchyTaskListModel::moveRows( const QModelIndex &sourceParent,
 		pDestinationParentTask->swapChilds( nSourceRow, nDestinationRow );
 	else
 	{
-        //pSourceParentTask->removeChild( pTask );
-
-        if ( nDestinationRow == pDestinationParentTask->getChildsCount() )
+        if ( nDestinationRow == pDestinationParentTask->getChildsCount() - 1)
             pDestinationParentTask->addChild(pTask);
 		else
-            pDestinationParentTask->insertChild(pTask, nDestinationRow - 1);
+            pDestinationParentTask->insertChild(pTask, nDestinationRow );
 	}
 
 	if ( retVal )

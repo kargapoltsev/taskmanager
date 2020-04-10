@@ -103,24 +103,22 @@ void MainWindow::slotUpTask()
     if ( !currentIndex.isValid() )
         return;
 
-    const auto nIndexRow = currentIndex.row();
+    const auto nCurrentPosition = currentIndex.row();
 
-    if ( nIndexRow == 0 )
+    if ( nCurrentPosition == 0 )
     {
 		auto parentIndex = currentIndex.parent();
-
         if ( !parentIndex.isValid() )
             return;
 
-		auto nParentIndexRow = parentIndex.row();
+        auto nParentPosition = parentIndex.row();
 
-        auto aboveTaskIndex = m_pModel->index( nParentIndexRow - 1, 0, parentIndex.parent() );
+        auto aboveTaskIndex = m_pModel->index( nParentPosition - 1, 0, parentIndex.parent() );
         if ( !aboveTaskIndex.isValid() )
             return;
 
-
         if ( const auto nRowCount = m_pModel->rowCount( aboveTaskIndex );
-             m_pModel->moveRow( parentIndex, nIndexRow, aboveTaskIndex, nRowCount ) )
+             m_pModel->moveRow( parentIndex, nCurrentPosition, aboveTaskIndex, nRowCount - 1 ) )
         {
             m_pView->setCurrentIndex( m_pModel->index( nRowCount, 0, aboveTaskIndex ) );
 			update();
@@ -135,18 +133,41 @@ void MainWindow::slotUpTask()
 
 void MainWindow::slotDownTask()
 {
-    const auto index = m_pView->selectionModel()->currentIndex();
+    const auto currentIndex = m_pView->selectionModel()->currentIndex();
 
-    if ( !index.isValid() )
+    if ( !currentIndex.isValid() )
         return;
 
-    const auto nCurrentPositoin = index.row();
-    const auto nNewPosition = nCurrentPositoin + 1;
+    const auto nCurrentPosition = currentIndex.row();
 
-    if ( m_pModel->moveRow( index.parent(), nCurrentPositoin, index.parent(), nNewPosition ) )
+    auto parentIndex = currentIndex.parent();
+    if ( !parentIndex.isValid() )
+        return;
+
+
+    if ( nCurrentPosition == m_pModel->rowCount( parentIndex ) - 1 )
     {
-        m_pView->setCurrentIndex( m_pModel->index( nNewPosition, 0, index.parent() ) );
-        update();
+        auto nParentPosition = parentIndex.row();
+
+        auto undexTaskIndex = m_pModel->index( nParentPosition + 1, 0, parentIndex.parent() );
+        if ( !undexTaskIndex.isValid() )
+            return;
+
+        if ( m_pModel->moveRow( parentIndex, nCurrentPosition, undexTaskIndex, 0 ) )
+        {
+            m_pView->setCurrentIndex( m_pModel->index( 0, 0, undexTaskIndex ) );
+            update();
+        }
+    }
+    else
+    {
+        const auto nNewPosition = nCurrentPosition + 1;
+
+        if ( m_pModel->moveRow( parentIndex, nCurrentPosition, parentIndex, nNewPosition ) )
+        {
+            m_pView->setCurrentIndex( m_pModel->index( nNewPosition, 0, parentIndex ) );
+            update();
+        }
     }
 }
 
