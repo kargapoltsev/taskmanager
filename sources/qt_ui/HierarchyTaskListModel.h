@@ -30,6 +30,7 @@ public:
     void setProject( Project *pProject );
     void updateComplete( const QModelIndex &task );
     void setComplete( const QModelIndex &task );
+    void addNewTask();
 
 private:
     Task * getTaskFromIndex( const QModelIndex &index ) const;

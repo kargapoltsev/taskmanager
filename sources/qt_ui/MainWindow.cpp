@@ -81,15 +81,20 @@ void MainWindow::slotAddNewTask()
 {
     const auto &index = m_pView->selectionModel()->currentIndex();
 
-    if ( !index.isValid() )
-        return;
-
-    if ( m_pModel->insertRow( index.row() + 1, index.parent() ) )
+    if ( index.isValid() )
     {
-        m_pModel->updateComplete( index );
-        update();
+        if ( m_pModel->insertRow( index.row() + 1, index.parent() ) )
+        {
+            m_pModel->updateComplete( index );
+        }
+    }
+    else
+    {
+        if ( m_pModel->insertRow( 0, QModelIndex() ) )
+            m_pView->setCurrentIndex( m_pModel->index( 0, 0, QModelIndex() ) );
     }
 
+    update();
 }
 
 void MainWindow::slotRemoveTask()
