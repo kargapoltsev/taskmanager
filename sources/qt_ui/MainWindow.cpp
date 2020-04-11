@@ -101,6 +101,9 @@ void MainWindow::slotRemoveTask()
 {
     const auto index = m_pView->selectionModel()->currentIndex();
 
+    if ( !index.isValid() )
+        return;
+
     if ( m_pModel->removeRow( index.row(), index.parent() ) )
     {
         const auto &parentIndex = index.parent();
