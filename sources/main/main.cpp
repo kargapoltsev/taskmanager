@@ -77,7 +77,7 @@ int main(int argc, char** argv)
     MainWindow mw;
     mw.setTasksRepository( &taskRepository );
     mw.initialize();
-    mw.resize( 350, 310 );
+    mw.resize( 700, 420 );
     mw.show();
 
     return app.exec();

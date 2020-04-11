@@ -51,11 +51,15 @@ void MainWindow::initialize()
     pMenuTask->addAction( "&Ascent task", this,
                           &MainWindow::slotAscentTask, QKeySequence( Qt::CTRL + Qt::Key_Left ) );
 
+    pMenuTask->addAction( "&Complete", this,
+                          &MainWindow::slotCompleteTask, QKeySequence( Qt::Key_Space ) );
+
+
 
     QMainWindow::menuBar()->addMenu(( pMenuTask ));
 
-    auto pLabel = new QLabel( "Developming...", this );
-    QMainWindow::statusBar()->addWidget( pLabel );
+//    auto pLabel = new QLabel( "Developming...", this );
+    QMainWindow::statusBar()->showMessage( tr( "Developming..." ) );
 
     m_pCurrentProject = m_pDataStore->getProject( "Free tasks" );
 
@@ -64,6 +68,7 @@ void MainWindow::initialize()
     m_pView = new QTreeView( this );
     m_pView->setModel( m_pModel );
     m_pView->header()->moveSection( 1, 0 );
+    m_pView->header()->moveSection( 2, 1 );
 
     QMainWindow::setCentralWidget( m_pView );
 
@@ -77,13 +82,17 @@ void MainWindow::slotExit()
 
 void MainWindow::slotAddNewTask()
 {
-    const auto index = m_pView->selectionModel()->currentIndex();
+    const auto &index = m_pView->selectionModel()->currentIndex();
 
     if ( !index.isValid() )
         return;
 
     if ( m_pModel->insertRow( index.row() + 1, index.parent() ) )
+    {
+        m_pModel->updateComplete( index );
         update();
+    }
+
 }
 
 void MainWindow::slotRemoveTask()
@@ -91,7 +100,12 @@ void MainWindow::slotRemoveTask()
     const auto index = m_pView->selectionModel()->currentIndex();
 
     if ( m_pModel->removeRow( index.row(), index.parent() ) )
+    {
+        const auto &parentIndex = index.parent();
+        m_pModel->updateComplete( parentIndex );
         update();
+    }
+
 }
 
 void MainWindow::slotAddChildTask()
@@ -99,7 +113,10 @@ void MainWindow::slotAddChildTask()
     const auto index = m_pView->selectionModel()->currentIndex();
 
     if ( m_pModel->insertRow( 0, index ) )
+    {
+        m_pModel->updateComplete( index );
         update();
+    }
 }
 
 void MainWindow::slotUpTask()
@@ -222,6 +239,16 @@ void MainWindow::slotAscentTask()
     }
 }
 
+void MainWindow::slotCompleteTask()
+{
+    const auto currentIndex = m_pView->selectionModel()->currentIndex();
+    if ( !currentIndex.isValid() )
+        return;
+
+    m_pModel->setComplete( currentIndex );
+    update();
+}
+
 DataStore * MainWindow::getTasksRepository() const
 {
     return m_pDataStore;
@@ -238,4 +265,7 @@ void MainWindow::update()
     m_pView->resizeColumnToContents( 0 );
     m_pView->resizeColumnToContents( 1 );
     m_pView->resizeColumnToContents( 2 );
+
+    QMainWindow::statusBar()->showMessage( QString( tr("Project: %1 %2% complete") )
+    .arg( m_pCurrentProject->getStrName().c_str() ).arg( m_pCurrentProject->getRootTask()->getComplete() ) );
 }

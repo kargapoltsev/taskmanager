@@ -27,10 +27,9 @@ public:
     bool moveRows(const QModelIndex & sourceParent, int sourceRow, int count, const QModelIndex & destinationParent, int destinationChild) override;
     Qt::ItemFlags flags(const QModelIndex & index) const override;
 
-
-
     void setProject( Project *pProject );
-    void addTask( Task * pTask );
+    void updateComplete( const QModelIndex &task );
+    void setComplete( const QModelIndex &task );
 
 private:
     Task * getTaskFromIndex( const QModelIndex &index ) const;

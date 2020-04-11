@@ -1,9 +1,6 @@
 #include "Task.h"
 
 #include<algorithm>
-#include<sstream>
-
-#include <iostream>
 
 enum class Task::Priority {
     Low, Normal, Hight
@@ -27,12 +24,8 @@ Task::~Task()
 {
     if ( !m_childs.empty() )
     {
-        std::for_each( std::begin( m_childs ), std::end( m_childs ),
-        [=] ( ptr_t pChild )
-        {
-            if ( pChild )
-                delete pChild;
-        } );
+        for ( auto pChild : m_childs )
+            delete pChild;
 
         m_childs.clear();
     }
@@ -147,6 +140,24 @@ void Task::setParent( const ptr_t pParent )
         m_pParent->removeChild( this );
 
     m_pParent = pParent;
+}
+
+void Task::recalculateComplete()
+{
+    if ( !m_childs.empty() )
+    {
+        double complete = 0;
+
+        for ( const auto pChild : m_childs )
+            complete += pChild->getComplete();
+
+        complete /= m_childs.size();
+
+        m_nComplete = complete;
+    }
+
+    if ( m_pParent )
+        m_pParent->recalculateComplete();
 }
 
 std::uint8_t Task::getComplete() const

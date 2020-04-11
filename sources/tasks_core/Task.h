@@ -55,6 +55,8 @@ public:
 
     void remove();
 
+    void recalculateComplete();
+
 private:
     void setParent( const ptr_t pParent );
 

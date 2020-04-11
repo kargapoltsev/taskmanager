@@ -90,7 +90,7 @@ QVariant HierarchyTaskListModel::data( const QModelIndex & index, int role ) con
         return tr( "Normal" );
         break;
     case 2:
-        return tr( "0%" );
+        return QString( "%1%" ).arg( pTask->getComplete() );
         break;
     }
 
@@ -230,11 +230,34 @@ void HierarchyTaskListModel::setProject(Project * pProject)
     resetInternalData();
 }
 
-void HierarchyTaskListModel::addTask( Task * pTask )
+void HierarchyTaskListModel::updateComplete( const QModelIndex &index )
 {
-//    m_pProject->getRootTask()->addChild( pTask );
-//    emit dataChanged();
+    if ( !index.isValid() )
+        return;
+
+    if ( auto pTask = getTaskFromIndex( index ) )
+        pTask->recalculateComplete();
 }
+
+void HierarchyTaskListModel::setComplete( const QModelIndex &index )
+{
+    if ( !index.isValid() )
+        return;
+
+    if ( auto pChild = getTaskFromIndex( index ) )
+    {
+        if ( pChild->getChildsCount() != 0 )
+            return;
+
+        if ( pChild->getComplete() == 100 )
+            pChild->setComplete( 0 );
+        else
+            pChild->setComplete( 100 );
+
+        pChild->recalculateComplete();
+    }
+}
+
 
 Task *HierarchyTaskListModel::getTaskFromIndex(const QModelIndex & index) const
 {
