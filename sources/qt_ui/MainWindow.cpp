@@ -54,11 +54,8 @@ void MainWindow::initialize()
     pMenuTask->addAction( "&Complete", this,
                           &MainWindow::slotCompleteTask, QKeySequence( Qt::Key_Space ) );
 
-
-
     QMainWindow::menuBar()->addMenu(( pMenuTask ));
 
-//    auto pLabel = new QLabel( "Developming...", this );
     QMainWindow::statusBar()->showMessage( tr( "Developming..." ) );
 
     m_pCurrentProject = m_pDataStore->getProject( "Free tasks" );

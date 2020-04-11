@@ -101,13 +101,14 @@ bool HierarchyTaskListModel::setData( const QModelIndex &index, const QVariant &
 {
     if ( index.isValid() && role == Qt::EditRole )
     {
-        auto pTask = getTaskFromIndex( index );
+        if ( const auto strData = value.toString().toStdString(); !strData.empty() )
+        {
+            auto pTask = getTaskFromIndex( index );
 
-        pTask->setName( value.toString().toStdString() );
-
-        emit dataChanged( index, index, { Qt::DisplayRole, Qt::EditRole } );
-
-        return true;
+            pTask->setName( strData );
+            emit dataChanged( index, index, { Qt::DisplayRole, Qt::EditRole } );
+            return true;
+        }
     }
 
     return false;
