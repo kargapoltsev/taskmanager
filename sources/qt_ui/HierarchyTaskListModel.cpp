@@ -259,11 +259,6 @@ void HierarchyTaskListModel::setComplete( const QModelIndex &index )
     }
 }
 
-void HierarchyTaskListModel::addNewTask()
-{
-
-}
-
 
 Task *HierarchyTaskListModel::getTaskFromIndex(const QModelIndex & index) const
 {

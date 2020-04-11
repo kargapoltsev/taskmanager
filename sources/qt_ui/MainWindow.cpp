@@ -84,9 +84,7 @@ void MainWindow::slotAddNewTask()
     if ( index.isValid() )
     {
         if ( m_pModel->insertRow( index.row() + 1, index.parent() ) )
-        {
             m_pModel->updateComplete( index );
-        }
     }
     else
     {
