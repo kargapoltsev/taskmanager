@@ -6,14 +6,15 @@
 #include <list>
 
 
-//enum class TaskPriority { Low, Normal, Hight };
-
 class Task
 {
 public:
     using ptr_t = Task *;
 
-    enum class Priority;
+    enum class Priority
+    {
+        Low = 0, Normal = 1, Hight = 2, Fire = 3, COUNT = 4
+    };
 
     Task( const std::string &strName, ptr_t pParent = nullptr, const std::string &strUuid = "" );
     ~Task();
@@ -43,6 +44,7 @@ public:
     std::string getUuid() const;
 
     Priority getPriority() const;
+    std::string getPriorityString() const;
     void setPriority( const Priority &priority );
 
     static ptr_t create( const std::string &strName, ptr_t pParent = nullptr );

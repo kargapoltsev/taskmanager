@@ -30,11 +30,13 @@ public slots:
     void slotAddNewTask();
     void slotRemoveTask();
     void slotAddChildTask();
-    void slotUpTask();
-    void slotDownTask();
+    void slotUpTaskPosition();
+    void slotDownTaskPosition();
     void slotDiveTask();
     void slotAscentTask();
     void slotCompleteTask();
+    void slotUpTaskPriority();
+    void slotDownTaskPriority();
 
 private:
     DataStore * m_pDataStore;

@@ -87,7 +87,7 @@ QVariant HierarchyTaskListModel::data( const QModelIndex & index, int role ) con
         return tr( pTask->getName().c_str() );
         break;
     case 1:
-        return tr( "Normal" );
+        return tr( pTask->getPriorityString().c_str() );
         break;
     case 2:
         return QString( "%1%" ).arg( pTask->getComplete() );
@@ -256,6 +256,33 @@ void HierarchyTaskListModel::setComplete( const QModelIndex &index )
             pChild->setComplete( 100 );
 
         pChild->recalculateComplete();
+    }
+}
+
+void HierarchyTaskListModel::changePriority( const QModelIndex &index, bool isUp )
+{
+    if ( !index.isValid() )
+        return;
+
+    if ( auto pChild = getTaskFromIndex( index ) )
+    {
+        auto currentPriority = pChild->getPriority();
+
+        auto priorityIndex = static_cast<std::uint8_t>( currentPriority );
+        const auto priorityIndexesCount = static_cast<std::uint8_t>( Task::Priority::COUNT );
+
+        if ( isUp )
+        {
+            ++priorityIndex;
+
+            if ( priorityIndex < priorityIndexesCount )
+                pChild->setPriority( static_cast<Task::Priority>( priorityIndex ) );
+        }
+        else
+        {
+            if ( priorityIndex > 0 )
+                pChild->setPriority( static_cast<Task::Priority>( --priorityIndex ) );
+        }
     }
 }
 

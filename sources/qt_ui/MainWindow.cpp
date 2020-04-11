@@ -39,11 +39,11 @@ void MainWindow::initialize()
     pMenuTask->addAction( "Add &child task", this,
                           &MainWindow::slotAddChildTask, QKeySequence( Qt::CTRL + Qt::Key_Enter ) );
 
-    pMenuTask->addAction( "&Up task", this,
-                          &MainWindow::slotUpTask, QKeySequence( Qt::CTRL + Qt::Key_Up ) );
+    pMenuTask->addAction( "&Up position", this,
+                          &MainWindow::slotUpTaskPosition, QKeySequence( Qt::CTRL + Qt::Key_Up ) );
 
-    pMenuTask->addAction( "&Down task", this,
-                          &MainWindow::slotDownTask, QKeySequence( Qt::CTRL + Qt::Key_Down ) );
+    pMenuTask->addAction( "&Down position", this,
+                          &MainWindow::slotDownTaskPosition, QKeySequence( Qt::CTRL + Qt::Key_Down ) );
 
     pMenuTask->addAction( "&Dive task", this,
                           &MainWindow::slotDiveTask, QKeySequence( Qt::CTRL + Qt::Key_Right ) );
@@ -53,6 +53,13 @@ void MainWindow::initialize()
 
     pMenuTask->addAction( "&Complete", this,
                           &MainWindow::slotCompleteTask, QKeySequence( Qt::Key_Space ) );
+
+    pMenuTask->addAction( "&Up priority", this,
+                          &MainWindow::slotUpTaskPriority, QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Up ) );
+
+    pMenuTask->addAction( "&Down priority", this,
+                          &MainWindow::slotDownTaskPriority, QKeySequence( Qt::CTRL + Qt::SHIFT + Qt::Key_Down ) );
+
 
     QMainWindow::menuBar()->addMenu(( pMenuTask ));
 
@@ -122,7 +129,7 @@ void MainWindow::slotAddChildTask()
     }
 }
 
-void MainWindow::slotUpTask()
+void MainWindow::slotUpTaskPosition()
 {
     const auto currentIndex = m_pView->selectionModel()->currentIndex();
 
@@ -156,7 +163,7 @@ void MainWindow::slotUpTask()
     }
 }
 
-void MainWindow::slotDownTask()
+void MainWindow::slotDownTaskPosition()
 {
     const auto currentIndex = m_pView->selectionModel()->currentIndex();
 
@@ -249,6 +256,26 @@ void MainWindow::slotCompleteTask()
         return;
 
     m_pModel->setComplete( currentIndex );
+    update();
+}
+
+void MainWindow::slotUpTaskPriority()
+{
+    const auto currentIndex = m_pView->selectionModel()->currentIndex();
+    if ( !currentIndex.isValid() )
+        return;
+
+    m_pModel->changePriority( currentIndex, true );
+    update();
+}
+
+void MainWindow::slotDownTaskPriority()
+{
+    const auto currentIndex = m_pView->selectionModel()->currentIndex();
+    if ( !currentIndex.isValid() )
+        return;
+
+    m_pModel->changePriority( currentIndex, false );
     update();
 }
 

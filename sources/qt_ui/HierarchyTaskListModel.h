@@ -28,8 +28,10 @@ public:
     Qt::ItemFlags flags(const QModelIndex & index) const override;
 
     void setProject( Project *pProject );
-    void updateComplete( const QModelIndex &task );
-    void setComplete( const QModelIndex &task );
+
+    void updateComplete( const QModelIndex &index );
+    void setComplete( const QModelIndex &index );
+    void changePriority( const QModelIndex &index, bool isUp = true );
 
 private:
     Task * getTaskFromIndex( const QModelIndex &index ) const;

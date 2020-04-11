@@ -2,10 +2,6 @@
 
 #include<algorithm>
 
-enum class Task::Priority {
-    Low, Normal, Hight
-};
-
 Task::Task( const std::string &strName, ptr_t pParent, const std::string &strUuid )
     : m_pParent( pParent )
     , m_strName( strName )
@@ -211,6 +207,32 @@ std::string Task::getUuid() const
 Task::Priority Task::getPriority() const
 {
     return m_priority;
+}
+
+std::string Task::getPriorityString() const
+{
+    switch ( m_priority )
+    {
+    case Task::Priority::Low:
+        return std::string( "Low" );
+        break;
+
+    case Task::Priority::Normal:
+        return std::string( "Normal" );
+        break;
+
+    case Task::Priority::Hight:
+        return std::string( "Hight" );
+        break;
+
+    case Task::Priority::Fire:
+        return std::string( "Fire" );
+        break;
+
+    case Task::Priority::COUNT:
+        return std::string( "4" );
+        break;
+    }
 }
 
 void Task::setPriority(const Task::Priority & priority)
