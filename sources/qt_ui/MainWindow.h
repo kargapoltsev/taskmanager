@@ -3,12 +3,10 @@
 #include <memory>
 #include <QMainWindow>
 
-class QTreeView;
 
 class DataStore;
 class Project;
-
-class HierarchyTaskListModel;
+class HierarchyTaskList;
 
 class MainWindow : public QMainWindow
 {
@@ -19,28 +17,35 @@ public:
 
     void initialize();
 
-    DataStore * getTasksRepository() const;
-    void setTasksRepository( DataStore * pTasksRepository );
+    DataStore * getDataStore() const;
+    void setDataStore(DataStore * pDataStore);
 
 private:
     void update();
+    void createActions();
+    void createMenus();
+    void createStatusBar();
 
-public slots:
-    void slotExit();
-    void slotAddNewTask();
-    void slotRemoveTask();
-    void slotAddChildTask();
-    void slotUpTaskPosition();
-    void slotDownTaskPosition();
-    void slotDiveTask();
-    void slotAscentTask();
-    void slotCompleteTask();
-    void slotUpTaskPriority();
-    void slotDownTaskPriority();
+private slots:
+    void setStatusbarMessage( const QString &strMessage );
 
 private:
-    DataStore * m_pDataStore;
+    DataStore *m_pDataStore;
+    HierarchyTaskList *m_pHierarchyTaskList;
     Project *m_pCurrentProject;
-    HierarchyTaskListModel *m_pModel;
-    QTreeView *m_pView;
+
+    QAction *m_pExitAction;
+    QAction *m_pAddNewTaskAction;
+    QAction *m_pRemoveTaskAction;
+    QAction *m_pAddChildTaskAction;
+    QAction *m_pUpTaskPositionAction;
+    QAction *m_pDownTaskPositionAction;
+    QAction *m_pDiveTaskAction;
+    QAction *m_pAscentTaskAction;
+    QAction *m_pCompleteTaskAction;
+    QAction *m_pUpTaskPriorityAction;
+    QAction *m_pDownTaskPriorityAction;
+
+    QMenu *m_pFileMenu;
+    QMenu *m_pTaskMenu;
 };

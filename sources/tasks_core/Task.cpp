@@ -214,25 +214,22 @@ std::string Task::getPriorityString() const
     switch ( m_priority )
     {
     case Task::Priority::Low:
-        return std::string( "Low" );
-        break;
+        return "Low";
 
     case Task::Priority::Normal:
-        return std::string( "Normal" );
-        break;
+        return "Normal";
 
     case Task::Priority::Hight:
-        return std::string( "Hight" );
-        break;
+        return "Hight";
 
     case Task::Priority::Fire:
-        return std::string( "Fire" );
-        break;
+        return "Fire";
 
     case Task::Priority::COUNT:
-        return std::string( "4" );
-        break;
+        return "4";
     }
+
+    return "";
 }
 
 void Task::setPriority(const Task::Priority & priority)

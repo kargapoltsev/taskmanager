@@ -30,6 +30,8 @@ public:
 
     std::size_t getTasksCount() const;
 
+    std::uint8_t getComplete() const;
+
 private:
     void registerTaskRecursive( Task *pTask );
     void removeTaskRecursive( Task *pTask );

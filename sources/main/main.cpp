@@ -70,12 +70,12 @@ int main(int argc, char** argv)
     upProject->addTask( pTask4 );
     upProject->addTask( pTask5 );
 
-    DataStore taskRepository;
-    taskRepository.addProject( std::move( upProject ) );
+    DataStore dataStore;
+    dataStore.addProject( std::move( upProject ) );
 
     QApplication app(argc, argv);
     MainWindow mw;
-    mw.setTasksRepository( &taskRepository );
+    mw.setDataStore( &dataStore );
     mw.initialize();
     mw.resize( 700, 420 );
     mw.show();

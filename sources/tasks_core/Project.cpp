@@ -78,6 +78,11 @@ std::size_t Project::getTasksCount() const
     return m_tasksCache.size();
 }
 
+uint8_t Project::getComplete() const
+{
+    return m_upRootTask->getComplete();
+}
+
 void Project::registerTaskRecursive( Task * pTask )
 {
     if ( pTask->getChildsCount() > 0 )

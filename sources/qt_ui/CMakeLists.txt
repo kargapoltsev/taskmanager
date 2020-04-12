@@ -12,11 +12,13 @@ endif()
 
 set ( HEADER_FILES 
     "MainWindow.h"
+    "HierarchyTaskList.h"
     "HierarchyTaskListModel.h"
     )
 
 set ( SOURCE_FILES 
     "MainWindow.cpp"
+    "HierarchyTaskList.cpp"
     "HierarchyTaskListModel.cpp"
     )
 
