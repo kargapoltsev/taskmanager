@@ -14,12 +14,14 @@ set ( HEADER_FILES
     "MainWindow.h"
     "HierarchyTaskList.h"
     "HierarchyTaskListModel.h"
+    "TaskNoteEditor.h"
     )
 
 set ( SOURCE_FILES 
     "MainWindow.cpp"
     "HierarchyTaskList.cpp"
     "HierarchyTaskListModel.cpp"
+    "TaskNoteEditor.cpp"
     )
 
 add_library( ${LIB_NAME} SHARED ${HEADER_FILES} ${SOURCE_FILES} )

@@ -14,10 +14,12 @@ HierarchyTaskList::HierarchyTaskList( QWidget *pParent )
 
 void HierarchyTaskList::initialize()
 {
-
     QTreeView::setModel( m_pModel );
     QTreeView::header()->moveSection( 1, 0 );
     QTreeView::header()->moveSection( 2, 1 );
+
+    QObject::connect( selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &HierarchyTaskList::slotHandleSelectedTask );
 }
 
 void HierarchyTaskList::setProject( Project * pProject )
@@ -218,6 +220,18 @@ void HierarchyTaskList::slotDownTaskPriority()
 
     m_pModel->changePriority( currentIndex, false );
     update();
+}
+
+
+
+void HierarchyTaskList::slotHandleSelectedTask(const QItemSelection &selected, const QItemSelection &)
+{
+    auto index = selected.indexes().first();
+    auto pTask = m_pModel->getTask( index );
+    if ( pTask == nullptr )
+        return;
+
+    emit selectedTaskChanged( pTask );
 }
 
 void HierarchyTaskList::update()

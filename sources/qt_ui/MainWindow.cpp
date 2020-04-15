@@ -3,17 +3,20 @@
 #include <string>
 #include <iostream>
 
-#include <QMenuBar>
-#include <QStatusBar>
-#include <QLabel>
-#include <QHeaderView>
-
-#include "HierarchyTaskList.h"
+#include <QtWidgets>
 
 #include "DataStore.h"
+#include "HierarchyTaskList.h"
+#include "TaskNoteEditor.h"
+
+//#include "Project.h"
+#include "Task.h"
+
 
 MainWindow::MainWindow()
     : m_pHierarchyTaskList( new HierarchyTaskList( this ) )
+    , m_pTaskNoteEditor( new TaskNoteEditor( this ) )
+    , m_pWidget( new QWidget( this ) )
 {
 
 }
@@ -23,11 +26,11 @@ void MainWindow::initialize()
     createActions();
     createMenus();
     createStatusBar();
+    createCentralWidget();
 
     m_pCurrentProject = m_pDataStore->getProject( "Free tasks" );
     m_pHierarchyTaskList->setProject( m_pCurrentProject );
 
-    QMainWindow::setCentralWidget( m_pHierarchyTaskList );
 }
 
 
@@ -133,7 +136,27 @@ void MainWindow::createStatusBar()
              this, &MainWindow::setStatusbarMessage );
 }
 
+void MainWindow::createCentralWidget()
+{
+    auto pHBoxLayout = new QHBoxLayout( m_pWidget );
+
+    auto pSplitter = new QSplitter( m_pWidget );
+    pSplitter->addWidget( m_pHierarchyTaskList );
+    pSplitter->addWidget( m_pTaskNoteEditor );
+
+    pHBoxLayout->addWidget( pSplitter );
+
+    m_pWidget->setLayout( pHBoxLayout );
+
+    QMainWindow::setCentralWidget( m_pWidget );
+
+    connect( m_pHierarchyTaskList, &HierarchyTaskList::selectedTaskChanged,
+             m_pTaskNoteEditor, &TaskNoteEditor::setTask );
+}
+
 void MainWindow::setStatusbarMessage(const QString & strMessage)
 {
     QMainWindow::statusBar()->showMessage( strMessage );
 }
+
+

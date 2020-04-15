@@ -7,6 +7,7 @@
 class DataStore;
 class Project;
 class HierarchyTaskList;
+class TaskNoteEditor;
 
 class MainWindow : public QMainWindow
 {
@@ -25,15 +26,12 @@ private:
     void createActions();
     void createMenus();
     void createStatusBar();
+    void createCentralWidget();
 
 private slots:
     void setStatusbarMessage( const QString &strMessage );
 
 private:
-    DataStore *m_pDataStore;
-    HierarchyTaskList *m_pHierarchyTaskList;
-    Project *m_pCurrentProject;
-
     QAction *m_pExitAction;
     QAction *m_pAddNewTaskAction;
     QAction *m_pRemoveTaskAction;
@@ -48,4 +46,12 @@ private:
 
     QMenu *m_pFileMenu;
     QMenu *m_pTaskMenu;
+
+
+    DataStore *m_pDataStore;
+    Project *m_pCurrentProject;
+
+    HierarchyTaskList *m_pHierarchyTaskList;
+    TaskNoteEditor *m_pTaskNoteEditor;
+    QWidget *m_pWidget;
 };

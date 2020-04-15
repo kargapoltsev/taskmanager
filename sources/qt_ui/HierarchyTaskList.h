@@ -24,6 +24,7 @@ public:
 
 signals:
     void signalProjectUpdated( const QString &strMessage );
+    void selectedTaskChanged( Task *pTask );
 
 public slots:
     void slotAddNewTask();
@@ -36,6 +37,9 @@ public slots:
     void slotCompleteTask();
     void slotUpTaskPriority();
     void slotDownTaskPriority();
+
+private slots:
+    void slotHandleSelectedTask( const QItemSelection&, const QItemSelection& );
 
 private:
     void update();

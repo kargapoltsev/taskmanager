@@ -33,6 +33,9 @@ public:
     void setComplete( const QModelIndex &index );
     void changePriority( const QModelIndex &index, bool isUp = true );
 
+    std::string getUuid( const QModelIndex &index ) const;
+    Task * getTask( const QModelIndex &index ) const;
+
 private:
     Task * getTaskFromIndex( const QModelIndex &index ) const;
 
