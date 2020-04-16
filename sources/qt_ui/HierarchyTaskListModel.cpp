@@ -286,24 +286,6 @@ void HierarchyTaskListModel::changePriority( const QModelIndex &index, bool isUp
     }
 }
 
-std::string HierarchyTaskListModel::getUuid( const QModelIndex &index ) const
-{
-    return getTask( index )->getUuid();
-}
-
-Task * HierarchyTaskListModel::getTask(const QModelIndex & index) const
-{
-    if ( !index.isValid() )
-        throw std::logic_error( "Incorrent index" );
-
-    const auto pTask = getTaskFromIndex( index );
-    if ( !pTask )
-        throw std::logic_error( "Incorrect task pointer" );
-
-    return pTask;
-}
-
-
 Task *HierarchyTaskListModel::getTaskFromIndex(const QModelIndex & index) const
 {
     if ( m_pProject == nullptr )

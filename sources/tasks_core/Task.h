@@ -59,6 +59,9 @@ public:
 
     void recalculateComplete();
 
+    std::string getNote() const;
+    void setNote(const std::string & strNote);
+
 private:
     void setParent( const ptr_t pParent );
 
@@ -69,4 +72,5 @@ private:
     Priority m_priority;
     std::uint8_t m_nComplete;
     std::list<ptr_t> m_childs;
+    std::string m_strNote;
 };

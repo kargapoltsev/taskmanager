@@ -227,7 +227,7 @@ void HierarchyTaskList::slotDownTaskPriority()
 void HierarchyTaskList::slotHandleSelectedTask(const QItemSelection &selected, const QItemSelection &)
 {
     auto index = selected.indexes().first();
-    auto pTask = m_pModel->getTask( index );
+    auto pTask = m_pModel->getTaskFromIndex( index );
     if ( pTask == nullptr )
         return;
 

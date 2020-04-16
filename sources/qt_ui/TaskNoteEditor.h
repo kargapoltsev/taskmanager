@@ -13,6 +13,9 @@ public:
 public slots:
     void setTask( Task *pTask );
 
+private slots:
+    void saveNote();
+
 private:
     Task *m_pTask;
 };

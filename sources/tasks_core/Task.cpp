@@ -138,12 +138,22 @@ void Task::setParent( const ptr_t pParent )
     m_pParent = pParent;
 }
 
+std::string Task::getNote() const
+{
+    return m_strNote;
+}
+
+void Task::setNote(const std::string & strNote)
+{
+    m_strNote = strNote;
+}
+
 void Task::recalculateComplete()
 {
     if ( !m_childs.empty() )
     {
         double complete = 0;
-
+        
         for ( const auto pChild : m_childs )
             complete += pChild->getComplete();
 
