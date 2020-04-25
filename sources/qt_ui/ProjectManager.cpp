@@ -81,6 +81,9 @@ void ProjectManager::showEditCurrentProjectDialog()
 
 void ProjectManager::removeCurrentProject()
 {
+    if ( m_pDataStore->getProjectsCount() == 0 )
+        return;
+
     if ( m_pDataStore->getProjectsCount() > 1 )
     {
         auto nIndex = m_pProjectsComboBox->currentIndex();
