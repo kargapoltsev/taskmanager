@@ -13,10 +13,14 @@ void TaskNoteEditor::setTask( Task * pTask )
 {
     m_pTask = pTask;
 
-    QTextEdit::setText( QString::fromStdString( pTask->getNote() ) );
+    if ( m_pTask != nullptr )
+        QTextEdit::setText( QString::fromStdString( pTask->getNote() ) );
+    else
+        QTextEdit::clear();
 }
 
 void TaskNoteEditor::saveNote()
 {
-    m_pTask->setNote( QTextEdit::toPlainText().toStdString() );
+    if ( m_pTask != nullptr )
+        m_pTask->setNote( QTextEdit::toPlainText().toStdString() );
 }

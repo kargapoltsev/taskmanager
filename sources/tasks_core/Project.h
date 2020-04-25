@@ -32,6 +32,8 @@ public:
 
     std::uint8_t getComplete() const;
 
+    static Project * create( const std::string strName );
+
 private:
     void registerTaskRecursive( Task *pTask );
     void removeTaskRecursive( Task *pTask );

@@ -15,6 +15,9 @@ set ( HEADER_FILES
     "HierarchyTaskList.h"
     "HierarchyTaskListModel.h"
     "TaskNoteEditor.h"
+    "ProjectManager.h"
+    "ProjectListModel.h"
+    "LineEditDialog.h"
     )
 
 set ( SOURCE_FILES 
@@ -22,6 +25,9 @@ set ( SOURCE_FILES
     "HierarchyTaskList.cpp"
     "HierarchyTaskListModel.cpp"
     "TaskNoteEditor.cpp"
+    "ProjectManager.cpp"
+    "ProjectListModel.cpp"
+    "LineEditDialog.cpp"
     )
 
 add_library( ${LIB_NAME} SHARED ${HEADER_FILES} ${SOURCE_FILES} )

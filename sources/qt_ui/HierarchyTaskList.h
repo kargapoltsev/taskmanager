@@ -20,7 +20,7 @@ public:
 
     void initialize();
 
-    void setProject( Project *pProject );
+
 
 signals:
     void signalProjectUpdated( const QString &strMessage );
@@ -37,6 +37,8 @@ public slots:
     void slotCompleteTask();
     void slotUpTaskPriority();
     void slotDownTaskPriority();
+
+    void setProject( Project *pProject );
 
 private slots:
     void slotHandleSelectedTask( const QItemSelection&, const QItemSelection& );

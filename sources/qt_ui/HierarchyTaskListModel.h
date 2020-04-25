@@ -12,7 +12,7 @@ class HierarchyTaskListModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    HierarchyTaskListModel( QObject * pParent = nullptr );
+    HierarchyTaskListModel( QObject *pParent = nullptr );
 
     // QAbstractItemModel interface
     QModelIndex index(int row, int column, const QModelIndex & parent) const override;

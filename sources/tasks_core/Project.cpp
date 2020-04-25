@@ -83,6 +83,11 @@ uint8_t Project::getComplete() const
     return m_upRootTask->getComplete();
 }
 
+Project * Project::create( const std::string strName )
+{
+    return new Project( strName );
+}
+
 void Project::registerTaskRecursive( Task * pTask )
 {
     if ( pTask->getChildsCount() > 0 )

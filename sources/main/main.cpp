@@ -61,17 +61,21 @@ int main(int argc, char** argv)
     auto pTask4 = new Task( "Task4" );
     auto pTask5 = new Task( "Task5" );
 
-    auto upProject = std::make_unique<Project>( "Free tasks" );
+    auto upFreeTasksProject = std::make_unique<Project>( "Free tasks" );
 
-    upProject->addTask( pTask0 );
-    upProject->addTask( pTask1 );
-    upProject->addTask( pTask2 );
-    upProject->addTask( pTask3 );
-    upProject->addTask( pTask4 );
-    upProject->addTask( pTask5 );
+    upFreeTasksProject->addTask( pTask0 );
+    upFreeTasksProject->addTask( pTask1 );
+    upFreeTasksProject->addTask( pTask2 );
+    upFreeTasksProject->addTask( pTask3 );
+    upFreeTasksProject->addTask( pTask4 );
+    upFreeTasksProject->addTask( pTask5 );
+
+    auto upSomeOneProject = std::make_unique<Project>( "Someone" );
+    upSomeOneProject->addTask( Task::create( "Some task" ) );
 
     DataStore dataStore;
-    dataStore.addProject( std::move( upProject ) );
+    dataStore.addProject( std::move( upFreeTasksProject ) );
+    dataStore.addProject( std::move( upSomeOneProject ) );
 
     QApplication app(argc, argv);
     MainWindow mw;

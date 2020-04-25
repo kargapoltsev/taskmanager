@@ -8,6 +8,7 @@ class DataStore;
 class Project;
 class HierarchyTaskList;
 class TaskNoteEditor;
+class ProjectManager;
 
 class MainWindow : public QMainWindow
 {
@@ -54,4 +55,6 @@ private:
     HierarchyTaskList *m_pHierarchyTaskList;
     TaskNoteEditor *m_pTaskNoteEditor;
     QWidget *m_pWidget;
+
+    ProjectManager *m_pProjectSelector;
 };

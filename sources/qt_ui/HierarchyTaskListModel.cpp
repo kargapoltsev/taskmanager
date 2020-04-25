@@ -5,35 +5,40 @@
 #include "Project.h"
 #include "Task.h"
 
-
-HierarchyTaskListModel::HierarchyTaskListModel( QObject * pParent  )
+HierarchyTaskListModel::HierarchyTaskListModel( QObject* pParent )
     : QAbstractItemModel( pParent )
 {
 
 }
 
-QModelIndex HierarchyTaskListModel::index( int row, int column, const QModelIndex & parent ) const
+QModelIndex HierarchyTaskListModel::index( int row, int column, const QModelIndex& parent ) const
 {
-    if ( !m_pProject->getRootTask() || row < 0 || column < 0 )
+    if ( row < 0 || column < 0 )
+        return QModelIndex();
+
+    if ( !m_pProject || !m_pProject->getRootTask())
         return QModelIndex();
 
     auto pParentTask = getTaskFromIndex( parent );
     if ( !pParentTask )
         return QModelIndex();
 
-    if ( static_cast<std::size_t>( row ) >= pParentTask->getChildsCount() )
+    if ( static_cast<std::size_t>( row ) >= pParentTask->getChildsCount())
         return QModelIndex();
 
-    auto pChildTask = pParentTask->getChild( static_cast<std::size_t>( row ) );
+    auto pChildTask = pParentTask->getChild( static_cast<std::size_t>( row ));
     if ( !pChildTask )
         return QModelIndex();
 
     return createIndex( row, column, pChildTask );
 }
 
-QModelIndex HierarchyTaskListModel::parent( const QModelIndex & child ) const
+QModelIndex HierarchyTaskListModel::parent( const QModelIndex& child ) const
 {
-    if (!child.isValid())
+    if ( !m_pProject || !m_pProject->getRootTask())
+        return QModelIndex();
+
+    if ( !child.isValid())
         return QModelIndex();
 
     auto pChildTask = getTaskFromIndex( child );
@@ -48,32 +53,49 @@ QModelIndex HierarchyTaskListModel::parent( const QModelIndex & child ) const
     if ( !pGrandParentTask )
         return QModelIndex();
 
-    auto nParentPosition = pGrandParentTask->getChildIndex( pParentTask );
+    try
+    {
+        auto nParentPosition = pGrandParentTask->getChildIndex( pParentTask );
+        return createIndex( static_cast<int>(nParentPosition), 0, pParentTask );
+    }
+    catch ( ... )
+    {
+        return QModelIndex();
+    }
 
-    return createIndex( static_cast<int>(nParentPosition), 0, pParentTask );
 }
 
-int HierarchyTaskListModel::rowCount( const QModelIndex & parent ) const
+int HierarchyTaskListModel::rowCount( const QModelIndex& parent ) const
 {
     if ( parent.column() > 0 )
         return 0;
 
-    auto pParentTask = getTaskFromIndex( parent );
+    try
+    {
+        auto pParentTask = getTaskFromIndex( parent );
 
-    if ( !pParentTask )
+        if ( !pParentTask )
+            return 0;
+
+        return pParentTask->getChildsCount();
+    }
+    catch ( ... )
+    {
         return 0;
-
-    return pParentTask->getChildsCount();
+    }
 }
 
-int HierarchyTaskListModel::columnCount( const QModelIndex & /* parent */) const
+int HierarchyTaskListModel::columnCount( const QModelIndex& /* parent */) const
 {
     return 3;
 }
 
-QVariant HierarchyTaskListModel::data( const QModelIndex & index, int role ) const
+QVariant HierarchyTaskListModel::data( const QModelIndex& index, int role ) const
 {
-    if( role != Qt::DisplayRole )
+    if ( !m_pProject || !m_pProject->getRootTask())
+        return QVariant();
+
+    if ( role != Qt::DisplayRole )
         return QVariant();
 
     auto pTask = getTaskFromIndex( index );
@@ -81,27 +103,27 @@ QVariant HierarchyTaskListModel::data( const QModelIndex & index, int role ) con
     if ( !pTask )
         return QVariant();
 
-    switch ( index.column() )
+    switch ( index.column())
     {
     case 0:
-        return tr( pTask->getName().c_str() );
+        return tr( pTask->getName().c_str());
         break;
     case 1:
-        return tr( pTask->getPriorityString().c_str() );
+        return tr( pTask->getPriorityString().c_str());
         break;
     case 2:
-        return QString( "%1%" ).arg( pTask->getComplete() );
+        return QString( "%1%" ).arg( pTask->getComplete());
         break;
     }
 
     return QVariant();
 }
 
-bool HierarchyTaskListModel::setData( const QModelIndex &index, const QVariant &value, int role )
+bool HierarchyTaskListModel::setData( const QModelIndex& index, const QVariant& value, int role )
 {
     if ( index.isValid() && role == Qt::EditRole )
     {
-        if ( const auto strData = value.toString().toStdString(); !strData.empty() )
+        if ( const auto strData = value.toString().toStdString(); !strData.empty())
         {
             auto pTask = getTaskFromIndex( index );
 
@@ -135,44 +157,47 @@ QVariant HierarchyTaskListModel::headerData( int section, Qt::Orientation orient
     return QVariant();
 }
 
-bool HierarchyTaskListModel::insertRows( int row, int count, const QModelIndex & parent )
+bool HierarchyTaskListModel::insertRows( int row, int count, const QModelIndex& parent )
 {
+    if ( m_pProject == nullptr )
+        return false;
+
     auto pParentTask = getTaskFromIndex( parent );
     if ( !pParentTask )
         return false;
 
     QAbstractItemModel::beginInsertRows( parent, row, row + count - 1 );
 
-    auto pTask = new Task( QString("New task %1").arg( pParentTask->getChildsCount() + 1 ).toStdString() );
+    auto pTask = new Task( QString( "New task %1" ).arg( pParentTask->getChildsCount() + 1 ).toStdString());
 
     auto nRow = static_cast<std::size_t>(row);
 
-    if ( nRow != pParentTask->getChildsCount() )
+    if ( nRow != pParentTask->getChildsCount())
         m_pProject->insertTask( pTask, pParentTask, nRow );
     else
-        m_pProject->addTask( pTask , pParentTask );
+        m_pProject->addTask( pTask, pParentTask );
     QAbstractItemModel::endInsertRows();
 
     return true;
 }
 
-bool HierarchyTaskListModel::removeRows( int row, int count, const QModelIndex &parent )
+bool HierarchyTaskListModel::removeRows( int row, int count, const QModelIndex& parent )
 {
     auto pParentTask = getTaskFromIndex( parent );
     if ( !pParentTask )
         return false;
 
-    QAbstractItemModel::beginRemoveRows( parent, row, row + count - 1);
+    QAbstractItemModel::beginRemoveRows( parent, row, row + count - 1 );
     pParentTask->removeChild( row );
     QAbstractItemModel::endRemoveRows();
 
     return true;
 }
 
-bool HierarchyTaskListModel::moveRows( const QModelIndex &sourceParent,
-                                       int sourceRow, int count,
-                                       const QModelIndex &destinationParent,
-                                       int destinationChild )
+bool HierarchyTaskListModel::moveRows( const QModelIndex& sourceParent,
+    int sourceRow, int count,
+    const QModelIndex& destinationParent,
+    int destinationChild )
 {
     if ( destinationChild < 0 )
         return false;
@@ -183,41 +208,43 @@ bool HierarchyTaskListModel::moveRows( const QModelIndex &sourceParent,
     if ( !pSourceParentTask || !pDestinationParentTask )
         return false;
 
-	const auto nSourceRow = static_cast<std::size_t>( sourceRow );
+    const auto nSourceRow = static_cast<std::size_t>( sourceRow );
 
-	auto pTask = pSourceParentTask->getChild( nSourceRow );
-	if ( !pTask )
-		return false;
+    auto pTask = pSourceParentTask->getChild( nSourceRow );
+    if ( !pTask )
+        return false;
 
-	const auto nDestinationRow = static_cast<std::size_t>( destinationChild );
+    const auto nDestinationRow = static_cast<std::size_t>( destinationChild );
 
 //    if ( nDestinationRow > pDestinationParentTask->getChildsCount() )
 //        return false;
 
-	auto retVal = QAbstractItemModel::beginMoveRows( sourceParent, sourceRow, sourceRow + count - 1, destinationParent, destinationChild );
+    auto retVal = QAbstractItemModel::beginMoveRows( sourceParent, sourceRow,
+        sourceRow + count - 1, destinationParent, destinationChild );
 
-	if ( pSourceParentTask == pDestinationParentTask )
-		pDestinationParentTask->swapChilds( nSourceRow, nDestinationRow );
-	else
-	{
-        if ( nDestinationRow == 0 || pDestinationParentTask->getChildsCount() == 0 || pDestinationParentTask->getChildsCount() == nDestinationRow )
-            pDestinationParentTask->addChild(pTask);
-		else
-            pDestinationParentTask->insertChild(pTask, nDestinationRow - 1);
-	}
+    if ( pSourceParentTask == pDestinationParentTask )
+        pDestinationParentTask->swapChilds( nSourceRow, nDestinationRow );
+    else
+    {
+        if ( nDestinationRow == 0 || pDestinationParentTask->getChildsCount() == 0
+             || pDestinationParentTask->getChildsCount() == nDestinationRow )
+            pDestinationParentTask->addChild( pTask );
+        else
+            pDestinationParentTask->insertChild( pTask, nDestinationRow - 1 );
+    }
 
-	if ( retVal )
-		QAbstractItemModel::endMoveRows();
+    if ( retVal )
+        QAbstractItemModel::endMoveRows();
 
     return true;
 }
 
-Qt::ItemFlags HierarchyTaskListModel::flags(const QModelIndex & index) const
+Qt::ItemFlags HierarchyTaskListModel::flags( const QModelIndex& index ) const
 {
-    if ( !index.isValid() )
+    if ( !index.isValid())
         return Qt::NoItemFlags;
 
-    auto flags = QAbstractItemModel::flags(index);
+    auto flags = QAbstractItemModel::flags( index );
 
     if ( index.column() == 0 )
         flags |= Qt::ItemIsEditable;
@@ -225,27 +252,27 @@ Qt::ItemFlags HierarchyTaskListModel::flags(const QModelIndex & index) const
     return Qt::ItemIsEnabled | flags;
 }
 
-void HierarchyTaskListModel::setProject(Project * pProject)
+void HierarchyTaskListModel::setProject( Project* pProject )
 {
     m_pProject = pProject;
-    resetInternalData();
+    QAbstractItemModel::resetInternalData();
 }
 
-void HierarchyTaskListModel::updateComplete( const QModelIndex &index )
+void HierarchyTaskListModel::updateComplete( const QModelIndex& index )
 {
-    if ( !index.isValid() )
+    if ( !index.isValid())
         return;
 
-    if ( auto pTask = getTaskFromIndex( index ) )
+    if ( auto pTask = getTaskFromIndex( index ))
         pTask->recalculateComplete();
 }
 
-void HierarchyTaskListModel::setComplete( const QModelIndex &index )
+void HierarchyTaskListModel::setComplete( const QModelIndex& index )
 {
-    if ( !index.isValid() )
+    if ( !index.isValid())
         return;
 
-    if ( auto pChild = getTaskFromIndex( index ) )
+    if ( auto pChild = getTaskFromIndex( index ))
     {
         if ( pChild->getChildsCount() != 0 )
             return;
@@ -259,12 +286,12 @@ void HierarchyTaskListModel::setComplete( const QModelIndex &index )
     }
 }
 
-void HierarchyTaskListModel::changePriority( const QModelIndex &index, bool isUp )
+void HierarchyTaskListModel::changePriority( const QModelIndex& index, bool isUp )
 {
-    if ( !index.isValid() )
+    if ( !index.isValid())
         return;
 
-    if ( auto pChild = getTaskFromIndex( index ) )
+    if ( auto pChild = getTaskFromIndex( index ))
     {
         auto currentPriority = pChild->getPriority();
 
@@ -276,23 +303,23 @@ void HierarchyTaskListModel::changePriority( const QModelIndex &index, bool isUp
             ++priorityIndex;
 
             if ( priorityIndex < priorityIndexesCount )
-                pChild->setPriority( static_cast<Task::Priority>( priorityIndex ) );
+                pChild->setPriority( static_cast<Task::Priority>( priorityIndex ));
         }
         else
         {
             if ( priorityIndex > 0 )
-                pChild->setPriority( static_cast<Task::Priority>( --priorityIndex ) );
+                pChild->setPriority( static_cast<Task::Priority>( --priorityIndex ));
         }
     }
 }
 
-Task *HierarchyTaskListModel::getTaskFromIndex(const QModelIndex & index) const
+Task* HierarchyTaskListModel::getTaskFromIndex( const QModelIndex& index ) const
 {
     if ( m_pProject == nullptr )
-        throw std::logic_error( "Project pointer is empty" );
+        return nullptr;
 
-    if ( index.isValid() )
-        return static_cast<Task *>( index.internalPointer() );
+    if ( index.isValid())
+        return static_cast<Task*>( index.internalPointer());
     else
         return m_pProject->getRootTask();
 }

@@ -6,6 +6,8 @@
 #include "Project.h"
 #include "Task.h"
 
+#include "ProjectListModel.h"
+#include "DataStore.h"
 
 QtUiTest::QtUiTest() {
 
@@ -25,6 +27,14 @@ QtUiTest::QtUiTest() {
     pHierarchyTaskListModel->setProject( m_pProject );
 
     new QAbstractItemModelTester( pHierarchyTaskListModel, QAbstractItemModelTester::FailureReportingMode::QtTest, this );
+
+    auto pDataStore = new DataStore();
+    pDataStore->addProject( std::unique_ptr<Project>( m_pProject ) );
+
+    auto pProjectListModel = new ProjectListModel();
+    pProjectListModel->setDataStore( pDataStore );
+
+    new QAbstractItemModelTester( pProjectListModel, QAbstractItemModelTester::FailureReportingMode::QtTest, this );
 }
 
 QtUiTest::~QtUiTest()

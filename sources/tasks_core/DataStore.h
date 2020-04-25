@@ -10,13 +10,24 @@ class Task;
 
 class DataStore
 {
-public:
+ public:
     DataStore();
     void initialize();
 
-    void addProject( std::unique_ptr<Project> upProject );
-    Project * getProject( const std::string &strUuid );
+    // result, position
+    std::pair<bool, std::size_t> addProject( std::unique_ptr<Project> upProject );
 
-private:
+    std::pair<Project*, std::size_t> createProject( const std::string& strName );
+
+    [[nodiscard]] Project* getProject( std::size_t nProjectIndex ) const;
+    [[nodiscard]] std::size_t getProjectsCount() const;
+
+    void removeProject( std::size_t nProjectIndex );
+
+    std::pair<bool, std::size_t> renameProject( std::size_t nProjectIndex, const std::string &strName );
+
+    bool isHas( const std::string &strName );
+
+ private:
     std::map<std::string, std::unique_ptr<Project>> m_projects;
 };

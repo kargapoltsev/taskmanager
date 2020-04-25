@@ -4,6 +4,7 @@ set ( HEADER_FILES
     "Task.h"
     "Project.h"
     "DataStore.h"
+    "CoreExeptions.h"
 )
 
 set ( SOURCE_FILES 

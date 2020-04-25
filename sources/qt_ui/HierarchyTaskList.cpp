@@ -5,9 +5,9 @@
 #include "Project.h"
 #include "HierarchyTaskListModel.h"
 
-HierarchyTaskList::HierarchyTaskList( QWidget *pParent )
+HierarchyTaskList::HierarchyTaskList( QWidget* pParent )
     : QTreeView( pParent )
-    , m_pModel( new HierarchyTaskListModel( this ) )
+      , m_pModel( new HierarchyTaskListModel( this ))
 {
     initialize();
 }
@@ -19,29 +19,48 @@ void HierarchyTaskList::initialize()
     QTreeView::header()->moveSection( 2, 1 );
 
     QObject::connect( selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &HierarchyTaskList::slotHandleSelectedTask );
+        this, &HierarchyTaskList::slotHandleSelectedTask );
 }
 
-void HierarchyTaskList::setProject( Project * pProject )
+void HierarchyTaskList::setProject( Project* pProject )
 {
-    m_pProject = pProject;
-    m_pModel->setProject( m_pProject );
-    update();
+    if ( pProject != nullptr )
+    {
+        m_pProject = pProject;
+        m_pModel->setProject( m_pProject );
+
+        auto index = m_pModel->index( 0, 0, QModelIndex());
+        QTreeView::setCurrentIndex( index );
+
+        emit selectedTaskChanged( m_pModel->getTaskFromIndex( index ));
+
+        update();
+    }
+    else
+    {
+        m_pProject = nullptr;
+        m_pModel->setProject( nullptr );
+        emit selectedTaskChanged( nullptr );
+
+        emit signalProjectUpdated( tr( "No project has selected" ));
+
+        QTreeView::reset();
+    }
 }
 
 void HierarchyTaskList::slotAddNewTask()
 {
-    const auto &index = QTreeView::selectionModel()->currentIndex();
+    const auto& index = QTreeView::selectionModel()->currentIndex();
 
-    if ( index.isValid() )
+    if ( index.isValid())
     {
-        if ( m_pModel->insertRow( index.row() + 1, index.parent() ) )
+        if ( m_pModel->insertRow( index.row() + 1, index.parent()))
             m_pModel->updateComplete( index );
     }
     else
     {
-        if ( m_pModel->insertRow( 0, QModelIndex() ) )
-            QTreeView::setCurrentIndex( m_pModel->index( 0, 0, QModelIndex() ) );
+        if ( m_pModel->insertRow( 0, QModelIndex()))
+            QTreeView::setCurrentIndex( m_pModel->index( 0, 0, QModelIndex()));
     }
 
     update();
@@ -51,12 +70,12 @@ void HierarchyTaskList::slotRemoveTask()
 {
     const auto index = QTreeView::selectionModel()->currentIndex();
 
-    if ( !index.isValid() )
+    if ( !index.isValid())
         return;
 
-    if ( m_pModel->removeRow( index.row(), index.parent() ) )
+    if ( m_pModel->removeRow( index.row(), index.parent()))
     {
-        const auto &parentIndex = index.parent();
+        const auto& parentIndex = index.parent();
         m_pModel->updateComplete( parentIndex );
         update();
     }
@@ -66,7 +85,7 @@ void HierarchyTaskList::slotAddChildTask()
 {
     const auto index = QTreeView::selectionModel()->currentIndex();
 
-    if ( m_pModel->insertRow( 0, index ) )
+    if ( m_pModel->insertRow( 0, index ))
     {
         m_pModel->updateComplete( index );
         update();
@@ -77,7 +96,7 @@ void HierarchyTaskList::slotUpTaskPosition()
 {
     const auto currentIndex = QTreeView::selectionModel()->currentIndex();
 
-    if ( !currentIndex.isValid() )
+    if ( !currentIndex.isValid())
         return;
 
     const auto parentIndex = currentIndex.parent();
@@ -88,20 +107,20 @@ void HierarchyTaskList::slotUpTaskPosition()
     {
         auto nParentPosition = parentIndex.row();
 
-        auto aboveTaskIndex = m_pModel->index( nParentPosition - 1, 0, parentIndex.parent() );
-        if ( !aboveTaskIndex.isValid() )
+        auto aboveTaskIndex = m_pModel->index( nParentPosition - 1, 0, parentIndex.parent());
+        if ( !aboveTaskIndex.isValid())
             return;
 
         if ( const auto nRowCount = m_pModel->rowCount( aboveTaskIndex );
-             m_pModel->moveRow( parentIndex, nCurrentPosition, aboveTaskIndex, nRowCount ) )
+            m_pModel->moveRow( parentIndex, nCurrentPosition, aboveTaskIndex, nRowCount ))
         {
-            QTreeView::setCurrentIndex( m_pModel->index( nRowCount, 0, aboveTaskIndex ) );
+            QTreeView::setCurrentIndex( m_pModel->index( nRowCount, 0, aboveTaskIndex ));
             update();
         }
     }
     else
     {
-        if ( m_pModel->moveRow( parentIndex, nCurrentPosition, parentIndex, nCurrentPosition - 1 ) )
+        if ( m_pModel->moveRow( parentIndex, nCurrentPosition, parentIndex, nCurrentPosition - 1 ))
             update();
     }
 }
@@ -110,7 +129,7 @@ void HierarchyTaskList::slotDownTaskPosition()
 {
     const auto currentIndex = QTreeView::selectionModel()->currentIndex();
 
-    if ( !currentIndex.isValid() )
+    if ( !currentIndex.isValid())
         return;
 
     const auto nCurrentPosition = currentIndex.row();
@@ -123,13 +142,13 @@ void HierarchyTaskList::slotDownTaskPosition()
         if ( nParentPosition == -1 )
             return;
 
-        auto undexTaskIndex = m_pModel->index( nParentPosition + 1, 0, parentIndex.parent() );
-        if ( !undexTaskIndex.isValid() )
+        auto undexTaskIndex = m_pModel->index( nParentPosition + 1, 0, parentIndex.parent());
+        if ( !undexTaskIndex.isValid())
             return;
 
-        if ( m_pModel->moveRow( parentIndex, nCurrentPosition, undexTaskIndex, 1 ) )
+        if ( m_pModel->moveRow( parentIndex, nCurrentPosition, undexTaskIndex, 1 ))
         {
-            QTreeView::setCurrentIndex( m_pModel->index( 0, 0, undexTaskIndex ) );
+            QTreeView::setCurrentIndex( m_pModel->index( 0, 0, undexTaskIndex ));
             update();
         }
     }
@@ -137,9 +156,9 @@ void HierarchyTaskList::slotDownTaskPosition()
     {
         const auto nNewPosition = nCurrentPosition + 1;
 
-        if ( m_pModel->moveRow( parentIndex, nCurrentPosition, parentIndex, nNewPosition ) )
+        if ( m_pModel->moveRow( parentIndex, nCurrentPosition, parentIndex, nNewPosition ))
         {
-            QTreeView::setCurrentIndex( m_pModel->index( nNewPosition, 0, parentIndex ) );
+            QTreeView::setCurrentIndex( m_pModel->index( nNewPosition, 0, parentIndex ));
             update();
         }
     }
@@ -149,7 +168,7 @@ void HierarchyTaskList::slotDiveTask()
 {
     const auto currentIndex = QTreeView::selectionModel()->currentIndex();
 
-    if ( !currentIndex.isValid() )
+    if ( !currentIndex.isValid())
         return;
 
     const auto parentIndex = currentIndex.parent();
@@ -157,11 +176,11 @@ void HierarchyTaskList::slotDiveTask()
     const auto nCurrentPosition = currentIndex.row();
 
     auto aboveTaskIndex = m_pModel->index( nCurrentPosition - 1, 0, parentIndex );
-    if ( !aboveTaskIndex.isValid() )
+    if ( !aboveTaskIndex.isValid())
         return;
 
     if ( m_pModel->moveRow( parentIndex, nCurrentPosition,
-                            aboveTaskIndex, m_pModel->rowCount( aboveTaskIndex ) ) )
+        aboveTaskIndex, m_pModel->rowCount( aboveTaskIndex )))
         update();
 }
 
@@ -169,7 +188,7 @@ void HierarchyTaskList::slotAscentTask()
 {
     const auto currentIndex = QTreeView::selectionModel()->currentIndex();
 
-    if ( !currentIndex.isValid() )
+    if ( !currentIndex.isValid())
         return;
 
     const auto parentIndex = currentIndex.parent();
@@ -183,11 +202,11 @@ void HierarchyTaskList::slotAscentTask()
 
     const auto grandParentIndex = parentIndex.parent();
 
-    if ( m_pModel->moveRow( parentIndex, nCurrentPosition, grandParentIndex, 0 ) )
+    if ( m_pModel->moveRow( parentIndex, nCurrentPosition, grandParentIndex, 0 ))
     {
         QTreeView::setCurrentIndex(
-                    m_pModel->index( m_pModel->rowCount( grandParentIndex ) - 1,
-                    0, grandParentIndex ) );
+            m_pModel->index( m_pModel->rowCount( grandParentIndex ) - 1,
+                0, grandParentIndex ));
         update();
     }
 }
@@ -195,7 +214,7 @@ void HierarchyTaskList::slotAscentTask()
 void HierarchyTaskList::slotCompleteTask()
 {
     const auto currentIndex = QTreeView::selectionModel()->currentIndex();
-    if ( !currentIndex.isValid() )
+    if ( !currentIndex.isValid())
         return;
 
     m_pModel->setComplete( currentIndex );
@@ -205,7 +224,7 @@ void HierarchyTaskList::slotCompleteTask()
 void HierarchyTaskList::slotUpTaskPriority()
 {
     const auto currentIndex = QTreeView::selectionModel()->currentIndex();
-    if ( !currentIndex.isValid() )
+    if ( !currentIndex.isValid())
         return;
 
     m_pModel->changePriority( currentIndex, true );
@@ -215,18 +234,23 @@ void HierarchyTaskList::slotUpTaskPriority()
 void HierarchyTaskList::slotDownTaskPriority()
 {
     const auto currentIndex = QTreeView::selectionModel()->currentIndex();
-    if ( !currentIndex.isValid() )
+    if ( !currentIndex.isValid())
         return;
 
     m_pModel->changePriority( currentIndex, false );
     update();
 }
 
-
-
-void HierarchyTaskList::slotHandleSelectedTask(const QItemSelection &selected, const QItemSelection &)
+void HierarchyTaskList::slotHandleSelectedTask( const QItemSelection& selected, const QItemSelection& )
 {
+    if ( selected.isEmpty())
+        return;
+
     auto index = selected.indexes().first();
+
+    if ( !index.isValid())
+        return;
+
     auto pTask = m_pModel->getTaskFromIndex( index );
     if ( pTask == nullptr )
         return;
@@ -236,12 +260,17 @@ void HierarchyTaskList::slotHandleSelectedTask(const QItemSelection &selected, c
 
 void HierarchyTaskList::update()
 {
-    QTreeView::expandAll();
     QTreeView::resizeColumnToContents( 0 );
     QTreeView::resizeColumnToContents( 1 );
     QTreeView::resizeColumnToContents( 2 );
 
-    emit signalProjectUpdated( QString( tr("The project %1 is %2% complete") )
-                                   .arg( m_pProject->getStrName().c_str() ).arg( m_pProject->getComplete() ) );
+    QTreeView::expandAll();
+
+    QString strMessage;
+
+    if ( m_pProject )
+        emit signalProjectUpdated( tr( "The project %1 is %2% complete" )
+            .arg( m_pProject->getStrName().c_str()).arg( m_pProject->getComplete()));
+
 }
 
