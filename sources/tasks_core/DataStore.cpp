@@ -87,6 +87,7 @@ std::pair<bool, std::size_t> DataStore::renameProject( std::size_t nProjectIndex
 
     return std::make_pair( true, nPosition );
 }
+
 bool DataStore::isHas( const std::string& strName )
 {
     auto it = m_projects.find( strName );

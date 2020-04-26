@@ -135,6 +135,13 @@ Project* ProjectManager::getCurrentProject()
 
 void ProjectManager::createNewProject( const QString& strName )
 {
+    if ( strName.isEmpty() )
+    {
+        m_pMessageBox->setText( tr( "Entered name is empty" ).arg( strName ));
+        m_pMessageBox->show();
+        return;
+    }
+
     if ( const auto stdName = strName.toStdString(); !m_pDataStore->isHas( stdName ))
     {
         const auto[pProject, nPosition] = m_pDataStore->createProject( stdName );
@@ -157,18 +164,34 @@ void ProjectManager::createNewProject( const QString& strName )
 
 void ProjectManager::renameCurrentProject( const QString& strName )
 {
-    auto nIndex = m_pProjectsComboBox->currentIndex();
-
-    if ( nIndex < 0 )
-        return;
-
-    const auto &[ isRenamed, nPosition ] = m_pDataStore->renameProject(
-        static_cast<std::size_t>( nIndex ), strName.toStdString());
-
-    if ( isRenamed )
+    if ( strName.isEmpty() )
     {
-        m_pProjectsComboBox->setCurrentIndex( nPosition );
-        m_pProjectsComboBox->repaint();
+        m_pMessageBox->setText( tr( "Entered name is empty" ).arg( strName ));
+        m_pMessageBox->show();
+        return;
+    }
+
+
+    if ( const auto stdName = strName.toStdString(); !m_pDataStore->isHas( stdName ))
+    {
+        auto nIndex = m_pProjectsComboBox->currentIndex();
+
+        if ( nIndex < 0 )
+            return;
+
+        const auto &[isRenamed, nPosition] = m_pDataStore->renameProject(
+            static_cast<std::size_t>( nIndex ), stdName );
+
+        if ( isRenamed )
+        {
+            m_pProjectsComboBox->setCurrentIndex( nPosition );
+            m_pProjectsComboBox->repaint();
+        }
+    }
+    else
+    {
+        m_pMessageBox->setText( tr( "Project \"%1\" already exist" ).arg( strName ));
+        m_pMessageBox->show();
     }
 }
 
